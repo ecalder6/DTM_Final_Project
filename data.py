@@ -69,7 +69,8 @@ def index_(tokenized_sentences, vocab_size):
     index2word = ['_'] + [UNK] + [ x[0] for x in vocab ]
     # word2index
     word2index = dict([(w,i) for i,w in enumerate(index2word)] )
-    return index2word, word2index, freq_dist
+    vocab = list(map(lambda x: x[0], vocab))
+    return index2word, word2index, vocab
 
 
 '''
@@ -188,7 +189,7 @@ def process_data(input_filename, output_filename):
 
     # indexing -> idx2w, w2idx : en/ta
     print('\n >> Index words')
-    idx2w, w2idx, freq_dist = index_( qtokenized + atokenized, vocab_size=VOCAB_SIZE)
+    idx2w, w2idx, vocab = index_( qtokenized + atokenized, vocab_size=VOCAB_SIZE)
 
     print('\n >> Zero Padding')
     idx_q, idx_a = zero_pad(qtokenized, atokenized, w2idx)
@@ -201,12 +202,11 @@ def process_data(input_filename, output_filename):
     metadata = {
             'w2idx' : w2idx,
             'idx2w' : idx2w,
-            'limit' : limit,
-            'freq_dist' : freq_dist
+            'vocab' : vocab,
                 }
 
     # write to disk : data control dictionaries
-    with open('metadata.pkl', 'wb') as f:
+    with open('metadata', 'wb') as f:
         pickle.dump(metadata, f)
 
 if __name__ == '__main__':
