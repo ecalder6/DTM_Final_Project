@@ -71,7 +71,7 @@ def index_(tokenized_sentences, vocab_size):
     index2word = ['_'] + [UNK] + [ x[0] for x in vocab ]
     # word2index
     word2index = dict([(w,i) for i,w in enumerate(index2word)] )
-    vocab = list(map(lambda x: x[0], vocab))
+    vocab = list(map(lambda x: x[0], ['_'] + [UNK] + vocab))
     return index2word, word2index, vocab
 
 
