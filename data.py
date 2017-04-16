@@ -1,7 +1,5 @@
 EN_BLACKLIST = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~\''
 
-FILENAME = 'data/twitter.txt'
-
 limit = {
         'maxq' : 50,
         'minq' : 0,
@@ -145,10 +143,9 @@ def pad_seq(seq, lookup, maxlen):
 def _int64_feature(value):
   return tf.train.Feature(int64_list=tf.train.Int64List(value=value))
 
-def write_to_tfrecords(idx_q, idx_a):
+def write_to_tfrecords(output_filename, idx_q, idx_a):
     """Converts a dataset to tfrecords."""
-    filename = 'twitter.tfrecords'
-    writer = tf.python_io.TFRecordWriter(filename)
+    writer = tf.python_io.TFRecordWriter(output_filename)
 
     for q, a in zip(idx_q, idx_a):
         example = tf.train.Example(features=tf.train.Features(feature={
@@ -157,10 +154,10 @@ def write_to_tfrecords(idx_q, idx_a):
         writer.write(example.SerializeToString())
     writer.close()
 
-def process_data():
+def process_data(input_filename, output_filename):
 
     print('\n>> Read lines from file')
-    lines = read_lines(filename=FILENAME)
+    lines = read_lines(filename=input_filename)
 
     # change to lower case (just for en)
     lines = [ line.lower() for line in lines ]
@@ -198,7 +195,7 @@ def process_data():
 
     print('\n >> Convert to tfrecords and write to disk')
     # save them
-    write_to_tfrecords(idx_q, idx_a)
+    write_to_tfrecords(output_filename, idx_q, idx_a)
 
     # let us now save the necessary dictionaries
     metadata = {
@@ -213,4 +210,7 @@ def process_data():
         pickle.dump(metadata, f)
 
 if __name__ == '__main__':
-    process_data()
+    if len(sys.argv) < 3:
+        print("Specifiy Input_file_name and output_file_name")
+        exit(0)
+    process_data(sys.argv[1], sys.argv[2])
