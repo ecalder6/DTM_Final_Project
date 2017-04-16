@@ -1,9 +1,11 @@
+# python3 data.py data/twitter.txt twitter.tfrecords
+
 EN_BLACKLIST = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~\''
 
 limit = {
-        'maxq' : 50,
+        'maxq' : 20,
         'minq' : 0,
-        'maxa' : 50,
+        'maxa' : 20,
         'mina' : 1
         }
 
@@ -32,7 +34,7 @@ def ddefault():
 
 '''
 def read_lines(filename):
-    return open(filename).read().split('\n')[:-1]
+    return open(filename, encoding="utf8").read().split('\n')[:-1]
 
 
 '''
@@ -163,29 +165,18 @@ def process_data(input_filename, output_filename):
     # change to lower case (just for en)
     lines = [ line.lower() for line in lines ]
 
-    print('\n:: Sample from read(p) lines')
-    print(lines[121:125])
-
     # filter out unnecessary characters
     print('\n>> Filter lines')
     lines = [ filter_line(line, EN_BLACKLIST) for line in lines ]
-    print(lines[121:125])
 
     # filter out too long or too short sequences
     print('\n>> 2nd layer of filtering')
     qlines, alines = filter_data(lines)
-    print('\nq : {0} ; a : {1}'.format(qlines[60], alines[60]))
-    print('\nq : {0} ; a : {1}'.format(qlines[61], alines[61]))
-
 
     # convert list of [lines of text] into list of [list of words ]
     print('\n>> Segment lines into words')
     qtokenized = [ wordlist.split(' ') for wordlist in qlines ]
     atokenized = [ wordlist.split(' ') for wordlist in alines ]
-    print('\n:: Sample from segmented list of words')
-    print('\nq : {0} ; a : {1}'.format(qtokenized[60], atokenized[60]))
-    print('\nq : {0} ; a : {1}'.format(qtokenized[61], atokenized[61]))
-
 
     # indexing -> idx2w, w2idx : en/ta
     print('\n >> Index words')
