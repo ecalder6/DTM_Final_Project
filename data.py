@@ -9,7 +9,7 @@ limit = {
         }
 
 UNK = 'unk'
-VOCAB_SIZE = 6000
+VOCAB_SIZE = 20000
 
 import random
 import sys
@@ -116,12 +116,14 @@ def process_data(input_filename, output_filename):
         for line in f.readlines():
             if skip:
                 skip = False
+                i += 1
                 continue
             line = line.strip().lower()
             line = line.translate(translate_table)
             tokens = tknzr.tokenize(line)
             if len(tokens) > limit['maxq']:
                 skip = True
+                i += 1
                 continue
             if i % 2:
                 qtokenized.append(tokens)
@@ -138,6 +140,16 @@ def process_data(input_filename, output_filename):
         idx_q, idx_a = zero_pad(qtokenized, atokenized, w2idx)
         print(idx_q[:5])
         print(idx_a[:5])
+
+        # count of unknowns
+
+        unk_count = (idx_q == 1).sum() + (idx_a == 1).sum()
+        # count of words
+
+        word_count = (idx_q > 1).sum() + (idx_a > 1).sum()
+        # % unknown
+
+        print('% unknown : {}'.format(100 * (unk_count/word_count)))
 
 
         print('\n >> Convert to tfrecords and write to disk')        
