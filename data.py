@@ -1,10 +1,9 @@
 # python3 data.py data/twitter.txt twitter.tfrecords
 
-EN_BLACKLIST = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~\''
-
+EN_WHITELIST = 'abcdefghijklmnopqrstuvwxyz '
 limit = {
         'maxq' : 20,
-        'minq' : 0,
+        'minq' : 1,
         'maxa' : 20,
         'mina' : 1
         }
@@ -19,41 +18,12 @@ import nltk
 import itertools
 from collections import defaultdict
 import tensorflow as tf
+import string
 
 import numpy as np
 
 import pickle
-
-
-def ddefault():
-    return 1
-
-'''
- read lines from file
-     return [list of lines]
-
-'''
-def read_lines(filename):
-    return open(filename, encoding="utf8").read().split('\n')[:-1]
-
-
-'''
- split sentences in one line
-  into multiple lines
-    return [list of lines]
-
-'''
-def split_line(line):
-    return line.split('.')
-
-
-'''
- remove anything that isn't in the vocabulary
-    return str(pure ta/en)
-
-'''
-def filter_line(line, blacklist):
-    return ''.join([ ch for ch in line if ch not in blacklist ])
+from nltk.tokenize import TweetTokenizer
 
 
 '''
@@ -68,39 +38,11 @@ def index_(tokenized_sentences, vocab_size):
     # get vocabulary of 'vocab_size' most used words
     vocab = freq_dist.most_common(vocab_size)
     # index2word
-    index2word = ['_'] + [UNK] + [ x[0] for x in vocab ]
+    index2word = ["_"] + [UNK] + [ x[0] for x in vocab ]
     # word2index
     word2index = dict([(w,i) for i,w in enumerate(index2word)] )
-    vocab = list(map(lambda x: x[0], ['_'] + [UNK] + vocab))
+    vocab = list(map(lambda x: x[0], ["_"] + [UNK] + vocab))
     return index2word, word2index, vocab
-
-
-'''
- filter too long and too short sequences
-    return tuple( filtered_ta, filtered_en )
-
-'''
-def filter_data(sequences):
-    filtered_q, filtered_a = [], []
-    raw_data_len = len(sequences)//2
-
-    for i in range(0, len(sequences), 2):
-        qlen, alen = len(sequences[i].split(' ')), len(sequences[i+1].split(' '))
-        if qlen >= limit['minq'] and qlen <= limit['maxq']:
-            if alen >= limit['mina'] and alen <= limit['maxa']:
-                filtered_q.append(sequences[i])
-                filtered_a.append(sequences[i+1])
-
-    # print the fraction of the original data, filtered
-    filt_data_len = len(filtered_q)
-    filtered = int((raw_data_len - filt_data_len)*100/raw_data_len)
-    print(str(filtered) + '% filtered from original data')
-
-    return filtered_q, filtered_a
-
-
-
-
 
 '''
  create the final dataset : 
@@ -151,6 +93,10 @@ def write_to_tfrecords(output_filename, idx_q, idx_a):
     writer = tf.python_io.TFRecordWriter(output_filename)
 
     for q, a in zip(idx_q, idx_a):
+        if not len(q):
+            print("NOT LEN Q!")
+        if not len(a):
+            print("NOT LEN A!")
         example = tf.train.Example(features=tf.train.Features(feature={
             'question': _int64_feature(q),
             'answer': _int64_feature(a)}))
@@ -158,47 +104,55 @@ def write_to_tfrecords(output_filename, idx_q, idx_a):
     writer.close()
 
 def process_data(input_filename, output_filename):
+    tknzr = TweetTokenizer(strip_handles=True, reduce_len=True)
+    translate_table = dict((ord(char), None) for char in string.punctuation)
+    with open(input_filename, encoding="utf8") as f:
+        i = 0
+        # Skip 2 lines at a time
+        skip = False
+        qtokenized = []
+        atokenized = []
+        print('\n >> Reading and tokenizing words')
+        for line in f.readlines():
+            if skip:
+                skip = False
+                continue
+            line = line.strip().lower()
+            line = line.translate(translate_table)
+            tokens = tknzr.tokenize(line)
+            if len(tokens) > limit['maxq']:
+                skip = True
+                continue
+            if i % 2:
+                qtokenized.append(tokens)
+            else:
+                atokenized.append(tokens)
+            i += 1
+        print(qtokenized[:5])
+        print(atokenized[:5])
+        print('\n >> Index words')
+        idx2w, w2idx, vocab = index_( qtokenized + atokenized, vocab_size=VOCAB_SIZE)
+        print(vocab[:5])
 
-    print('\n>> Read lines from file')
-    lines = read_lines(filename=input_filename)
+        print('\n >> Zero Padding')
+        idx_q, idx_a = zero_pad(qtokenized, atokenized, w2idx)
+        print(idx_q[:5])
+        print(idx_a[:5])
 
-    # change to lower case (just for en)
-    lines = [ line.lower() for line in lines ]
 
-    # filter out unnecessary characters
-    print('\n>> Filter lines')
-    lines = [ filter_line(line, EN_BLACKLIST) for line in lines ]
+        print('\n >> Convert to tfrecords and write to disk')        
+        write_to_tfrecords(output_filename, idx_q, idx_a)
 
-    # filter out too long or too short sequences
-    print('\n>> 2nd layer of filtering')
-    qlines, alines = filter_data(lines)
+        # let us now save the necessary dictionaries
+        metadata = {
+                'w2idx' : w2idx,
+                'idx2w' : idx2w,
+                'vocab' : vocab,
+                    }
 
-    # convert list of [lines of text] into list of [list of words ]
-    print('\n>> Segment lines into words')
-    qtokenized = [ wordlist.split(' ') for wordlist in qlines ]
-    atokenized = [ wordlist.split(' ') for wordlist in alines ]
-
-    # indexing -> idx2w, w2idx : en/ta
-    print('\n >> Index words')
-    idx2w, w2idx, vocab = index_( qtokenized + atokenized, vocab_size=VOCAB_SIZE)
-
-    print('\n >> Zero Padding')
-    idx_q, idx_a = zero_pad(qtokenized, atokenized, w2idx)
-
-    print('\n >> Convert to tfrecords and write to disk')
-    # save them
-    write_to_tfrecords(output_filename, idx_q, idx_a)
-
-    # let us now save the necessary dictionaries
-    metadata = {
-            'w2idx' : w2idx,
-            'idx2w' : idx2w,
-            'vocab' : vocab,
-                }
-
-    # write to disk : data control dictionaries
-    with open('metadata', 'wb') as f:
-        pickle.dump(metadata, f)
+        # write to disk : data control dictionaries
+        with open('metadata', 'wb') as f:
+            pickle.dump(metadata, f)
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
