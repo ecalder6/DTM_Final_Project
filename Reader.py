@@ -1,25 +1,35 @@
-import os, random, time, glob, pickle, itertools, string
+'''
+Reader for our final project.
+Deals with handling all the data reading, writing, pickling.
+'''
 
+import glob
+import pickle
+import itertools
+import string
 import nltk
-from collections import defaultdict
 import tensorflow as tf
 import numpy as np
 
 
-class Reader:
+class Reader(object):
+    '''
+    Reader class
+    '''
 
-    def __init__(self, data_dir='./', max_length=20):
+    def __init__(self, data_dir='', max_length=20, min_length=1):
         en_whitelist = 'abcdefghijklmnopqrstuvwxyz '
         unk_token = 'unk'
-
-
         self._data_dir = data_dir
-        self._max_length = max_length
+        self.max_length = max_length
+        self.min_length = min_length
 
-    def process_data(self, input_filename, output_filename, vocab_size=20000,  \
-                        meta_file='metadata', maxq=20, minq=1, maxa=20, mina=1):
-        self._vocab_size = vocab_size
-        self._max_length = maxq
+    def process_data(self, input_filename, output_filename, meta_file='metadata'):
+        '''
+        Takes in a text file and converts it into a tfrecord
+        '''
+        maxq = maxa = self._max_length
+        minq = mina = self._min_length
         tknzr = nltk.tokenize.TweetTokenizer(strip_handles=True, reduce_len=True)
         translate_table = dict((ord(char), None) for char in string.punctuation)
         with open(input_filename, encoding="utf8") as f:
@@ -45,7 +55,7 @@ class Reader:
                 else:
                     atokenized.append(tokens)
                 i += 1
-            idx2w, w2idx, vocab = self._index( qtokenized + atokenized)
+            idx2w, w2idx, vocab = self._index(qtokenized + atokenized)
 
             idx_q, idx_a = self._zero_pad(qtokenized, atokenized, w2idx, maxq, maxa)
 
@@ -152,44 +162,43 @@ class Reader:
                 indices.append(lookup[UNK])
         return indices + [0]*(maxlen - len(seq))
 
-    def read_records(self, files=None, max_length=20):
-        try:
-            self._max_length = max_length
-            proto_files = []
-            if files:
-                for f in files:
-                    proto_files += glob.glob(self._data_dir+f)
-            else:
-                proto_files = glob.glob(self._data_dir + '*.tfrecords')
-            # Construct a queue of records to read
-            filename_queue = tf.train.string_input_producer(proto_files)
+    
+    
+    def read_records(self, files=None, batch_size=100, min_after_dequeue=10000):
+        # try:
+        proto_files = []
+        if files:
+            for f in files:
+                proto_files += glob.glob(self._data_dir+f)
+        else:
+            proto_files = glob.glob(self._data_dir + '*.tfrecords')
+        # Construct a queue of records to read
+        filename_queue = tf.train.string_input_producer(proto_files)
 
-            # reader outputs the records from a TFRecords file
-            reader = tf.TFRecordReader()
-            _, serialized_example = reader.read(filename_queue)
+        # reader outputs the records from a TFRecords file
+        reader = tf.TFRecordReader()
+        _, serialized_example = reader.read(filename_queue)
 
-            self.features = tf.parse_single_example(
-                serialized_example,
-                # Defaults are not specified since both keys are required.
-                features={
-                    #'subredddit_id': tf.FixedLenFeature([], tf.int64),
-                    'question': tf.FixedLenFeature([max_length], tf.int64),
-                    'answer': tf.FixedLenFeature([max_length], tf.int64),
-                })
-        except Exception as e:
-            print("ERROR: Could not read records")
+        features = tf.parse_single_example(
+            serialized_example,
+            # Defaults are not specified since both keys are required.
+            features={
+                #'subredddit_id': tf.FixedLenFeature([], tf.int64),
+                'question': tf.FixedLenFeature([self.max_length], tf.int64),
+                'answer': tf.FixedLenFeature([self.max_length], tf.int64),
+            })
+        capacity = min_after_dequeue + 3 * batch_size
+        self.batch_size = batch_size
+        comment, replies = tf.train.shuffle_batch(
+            [features['question'], features['answer']],
+            batch_size=self.batch_size, capacity=capacity, min_after_dequeue=min_after_dequeue)
+        return comment, replies
+        # except Exception as e:
+        #     print("ERROR: Could not read records")
 
     def read_metadata(self, meta_file='metadata'):
         try:
-            self._meta = pickle.load( open( DATA_DIR + "metadata", "rb" ) )
+            self.meta = pickle.load( open( self._data_dir + "metadata", "rb" ) )
+            self.vocab_size = len(self.meta['vocab'])
         except Exception as e:
             print("ERROR: Metadata file not found")
-
-    def get_batches(self, features, batch_size=100, min_after_dequeue=10000):
-        self._min_after_dequeue = min_after_dequeue
-        self._capacity = min_after_dequeue + 3 * BATCH_SIZE
-        self._batch_size = batch_size
-
-        self._comment, self._replies = tf.train.shuffle_batch(
-            [features['question'], features['answer']],
-            batch_size=batch_size, capacity=self._capacity, min_after_dequeue=min_after_dequeue)
