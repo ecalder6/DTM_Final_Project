@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 from Reader import Reader
-from Seq2Seq import Seq2Seq
+from LSTMVAE import LSTMVAE
 
 import os, random, time, glob, pickle
 
@@ -25,6 +25,7 @@ def to_eng(ids, ix_to_word):
 
 # def print_shapes():
 #     train_vars = tf.trainable_variables()
+
 #     lines = ['']
 #     lines.append('Trainable Variables:')
 #     lines.append('====================')
@@ -62,12 +63,13 @@ def main():
 
 
 
-    seq2seq = Seq2Seq(tweets, replies, args.rnn_hidden_size, args.layers, reader.batch_size, \
-                args.emb_size, reader.vocab_size, seq_max_len)
-    ave_loss = seq2seq.get_loss(replies)
+    model = LSTMVAE(tweets, replies,
+                reader.batch_size, args.emb_size,
+                args.latent_size, reader.vocab_size, reader.max_length)
+    ave_loss = model.loss
     lr = tf.placeholder_with_default(learning_rate, [], name="lr")
-    train_op = seq2seq.train(ave_loss, lr)
-    sample = seq2seq.sample(args.sample_temp)
+    train_op = model.train(lr)
+    sample = model.sample(args.sample_temp)
 
 
     #print(print_shapes())
@@ -120,6 +122,7 @@ def get_args():
     parser.add_argument('--emb_size', default=512, type=int)
     parser.add_argument('--keep_prob', default=0.8, type=float)
     parser.add_argument('--sample_temp', default=0.7, type=float)
+    parser.add_argument('--latent_size', default=128, type=int)
     args = parser.parse_args()
     return args
 

@@ -28,8 +28,8 @@ class Reader(object):
         '''
         Takes in a text file and converts it into a tfrecord
         '''
-        maxq = maxa = self._max_length
-        minq = mina = self._min_length
+        maxq = maxa = self.max_length
+        minq = mina = self.min_length
         tknzr = nltk.tokenize.TweetTokenizer(strip_handles=True, reduce_len=True)
         translate_table = dict((ord(char), None) for char in string.punctuation)
         with open(input_filename, encoding="utf8") as f:
