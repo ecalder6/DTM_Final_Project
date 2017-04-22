@@ -107,6 +107,7 @@ def main():
             c, r = sess.run([tweets, sample])
             for i in range(20):
                 print("====================================")
+                # Windows: chcp 65001
                 print(to_eng(c[i], reader.meta['idx2w']), "-->", to_eng(r[:, i], reader.meta['idx2w']))
                 print("====================================")
 
