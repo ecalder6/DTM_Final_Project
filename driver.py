@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 from Reader import Reader
+from Converter import Converter
 from LSTMVAE import LSTMVAE
 
 import os, random, time, glob, pickle
@@ -54,7 +55,13 @@ def to_eng(ids, ix_to_word):
 
 def main():
     args = get_args()
-    reader = Reader(data_dir='./data/')
+
+    if args.run_converter:
+        converter = Converter(input_filename = args.data_dir + 'twitter.txt', output_filename = args.data_dir + 'twitter.tfrecords', meta_file = args.data_dir + 'metadata')
+        converter.process_data()
+
+    # Set up and run reader
+    reader = Reader(data_dir=args.data_dir)
     reader.read_metadata()
     tweets, replies = reader.read_records()
 
@@ -62,7 +69,7 @@ def main():
     learning_rate = args.learning_rate
 
 
-
+    # Set up model
     model = LSTMVAE(tweets, replies,
                 reader.batch_size, args.emb_size,
                 args.latent_size, reader.vocab_size, reader.max_length)
@@ -74,17 +81,24 @@ def main():
 
     #print(print_shapes())
 
+    # Set up training session
     sess = tf.Session()
     init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
     sess.run(init_op)
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
+    # Set up checkpoint
+    saver = tf.train.Saver()
+    latest_checkpoint = tf.train.latest_checkpoint(args.checkpoint_path)
+    if latest_checkpoint:
+        saver.restore(sess, latest_checkpoint)
+
     l_ave = b_ave = d_ave = 0
 
     UPDATE_EVERY = 100
 
-    for step in range(500):
+    for step in range(args.iterations):
         start_time = time.time()
         _, l = sess.run([train_op, ave_loss], {
             lr: 0.0001
@@ -112,8 +126,8 @@ def main():
                 print("====================================")
 
             l_ave = b_ave = d_ave = 0
+            saver.save(sess, args.checkpoint_path + "checkpoint", global_step=0)
     print("DONE")
-    #         saver.
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -124,6 +138,10 @@ def get_args():
     parser.add_argument('--keep_prob', default=0.8, type=float)
     parser.add_argument('--sample_temp', default=0.7, type=float)
     parser.add_argument('--latent_size', default=128, type=int)
+    parser.add_argument('--iterations', default=5000, type=int)
+    parser.add_argument('--data_dir', default='./data/', type=str)
+    parser.add_argument('--checkpoint_path', default='./twitter_checkpoints/', type=str)
+    parser.add_argument('--run_converter', default=False, type=bool)
     args = parser.parse_args()
     return args
 
