@@ -31,7 +31,6 @@ class LSTMVAE(object):
         # emb_size is the size of the internal state in each cell.
         # Note that cell state and hidden/output state are same size
         enc_cell = tf.contrib.rnn.BasicLSTMCell(emb_size)
-        #enc_cell = tf.contrib.rnn.MultiRNNCell([inner_cell] * layers)
 
         # Word embeddings
         # Gives a embedding for each word in the vocab
@@ -69,8 +68,6 @@ class LSTMVAE(object):
         z_mean = tf.add(tf.matmul(c_state.c, w1), b1)
         z_log_sigma_sq = tf.add(tf.matmul(c_state.c, log_sigma_w1), log_sigma_b1)
         # Sample random noise from gaussian
-
-
         eps = tf.random_normal(tf.stack([tf.shape(c_state.c)[0], latent_size]), 0, 1, dtype = tf.float32)
 
         # Get z
@@ -103,6 +100,11 @@ class LSTMVAE(object):
 
 
     def sample(self, sample_temp):
+        '''
+        Returns a sample from the decoder. loop_fn is what's ran
+        at each cell from the start of the decoder to the end.
+        outputs_ta is the output of the final cell.
+        '''
         def loop_fn(time, cell_output, cell_state, loop_state):
             if cell_output is None:  # time == 0
                 next_cell_state = self._latent_state  # state from the encoder
@@ -112,18 +114,15 @@ class LSTMVAE(object):
             else:
                 next_cell_state = cell_state
                 sample = tf.squeeze(tf.multinomial(cell_output / sample_temp, 1))
-                print(sample)
                 emb_sample = tf.nn.embedding_lookup(self._word_embeddings, sample)
                 next_input = emb_sample
                 emit_output = sample
             elements_finished = time >= tf.constant(self._max_len, shape=(self._batch_size,))
             finished = tf.reduce_all(elements_finished)
-            print(next_input)
             next_input = tf.cond(
                 finished,
                 lambda: tf.zeros([self._batch_size, self._emb_size], dtype=tf.float32),
                 lambda: next_input)
-            print(next_input)
             next_loop_state = None
             return elements_finished, next_input, next_cell_state, emit_output, next_loop_state
 
