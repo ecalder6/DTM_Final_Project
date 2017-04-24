@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 from tensorflow.contrib.rnn import LSTMStateTuple
 
 class LSTMVAE(object):
@@ -101,10 +102,11 @@ class LSTMVAE(object):
         # Entropy of Q. There should be another expectation but we use the stochastic trick to take
         # one sample of x (the current x) and use that as an approximation (look at bottom of page 9
         # in VAE tutorial)
-        mutual_loss = 0.5 * np.log(np.det(tf.exp(z_log_sigma_sq))) + emb_size*0.5*(1-np.log(2*np.pi))
+        mutual_loss = - 0.5 * np.log(np.det(tf.exp(z_log_sigma_sq))) + emb_size*0.5*(1-np.log(2*np.pi))
 
         # TODO: MAKE SURE EACH COST IS THE CORRECT SIGN!!! CHECK IF WE SHOULD BE GIVING THE SCORE
         # OR THE COST!!!
+        #self.loss = tf.reduce_mean(latent_loss + dec_loss + mutual_loss)
         self.loss = tf.reduce_mean(latent_loss + dec_loss)
 
 
