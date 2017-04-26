@@ -8,12 +8,12 @@ from LSTMVAE import LSTMVAE
 
 import os, random, time, glob, pickle
 
-import numpy as np
 import tensorflow as tf
 
 from functools import reduce
 import operator
 import argparse
+import csv
 
 
 def to_eng(ids, ix_to_word):
@@ -56,9 +56,9 @@ def to_eng(ids, ix_to_word):
 def main():
     args = get_args()
 
-    if args.run_converter:
-        converter = Converter(input_filename = args.data_dir + 'twitter.txt', output_filename = args.data_dir + 'twitter.tfrecords', meta_file = args.data_dir + 'metadata')
-        converter.process_data()
+    # if args.run_converter:
+    #     converter = Converter(input_filename = args.data_dir + 'twitter.txt', output_filename = args.data_dir + 'twitter.tfrecords', meta_file = args.data_dir + 'metadata')
+    #     converter.process_data()
 
     # Set up and run reader
     reader = Reader(data_dir=args.data_dir)
@@ -70,16 +70,20 @@ def main():
 
 
     # Set up model
-    model = LSTMVAE(tweets, replies,
-                reader.batch_size, args.emb_size,
-                args.latent_size, reader.vocab_size, reader.max_length)
-    ave_loss = model.loss
+    model = LSTMVAE(tweets, \
+                reader.batch_size, args.emb_size, \
+                args.latent_size, reader.vocab_size, reader.max_length, \
+                use_vae=args.use_vae, use_highway=args.use_highway)
+    out = model.get_outputs(replies)
+
+    loss = model.get_loss(replies, out, use_mutual=args.use_mutual)
+    kld = None
+    if args.use_vae:
+        kld = model.get_kl()
     lr = tf.placeholder_with_default(learning_rate, [], name="lr")
-    train_op = model.train(lr)
+    train_op = model.train(lr, loss)
     sample = model.sample(args.sample_temp)
 
-
-    #print(print_shapes())
 
     # Set up training session
     sess = tf.Session()
@@ -90,58 +94,74 @@ def main():
 
     # Set up checkpoint
     saver = tf.train.Saver()
-    latest_checkpoint = tf.train.latest_checkpoint(args.checkpoint_path)
+    checkpoint_path = args.checkpoint_path + "checkpoint_"+args.task+".ckpt"
+    latest_checkpoint = tf.train.latest_checkpoint(checkpoint_path)
     if latest_checkpoint:
         saver.restore(sess, latest_checkpoint)
 
+    ### Main loop for training
     l_ave = b_ave = d_ave = 0
-
-    UPDATE_EVERY = 100
-
+    UPDATE_EVERY = 10
+    objective_loss = []
+    kl_loss = []
+    duration = time.time()
     for step in range(args.iterations):
-        start_time = time.time()
-        _, l = sess.run([train_op, ave_loss], {
-            lr: 0.0001
-        })
-        duration = time.time() - start_time
+        obj_l = kl_l = None
+        if args.use_vae:
+            # Run one iteration for training and save the loss
+            _, obj_l, kl_l = sess.run([train_op, loss, kld], {
+                lr: learning_rate
+            })
+            kl_loss.append(kl_l)
+        else:
+            _, obj_l = sess.run([train_op, loss], {
+                lr: learning_rate
+            })
+        objective_loss.append(obj_l)
 
-        l_ave += l
-        b_ave += l / seq_max_len / np.log(2.)
-        d_ave += duration
-        
-        #print("|", end="")
+
         if step % UPDATE_EVERY == 0:
-            print()
-            l_ave = l_ave / UPDATE_EVERY if step else l_ave
-            b_ave = b_ave / UPDATE_EVERY if step else b_ave
-            d_ave = d_ave / UPDATE_EVERY if step else d_ave
-            
-            print(step)
-            print(l_ave, "(", b_ave, ")\t|", "%.3f sec" % d_ave)
-            c, r = sess.run([tweets, sample])
-            for i in range(20):
-                print("====================================")
+            print("\nIteration: ", step+1)
+            print("Duration: ", time.time()-duration )
+            print("Objective loss: %.3f" % obj_l)
+            if args.use_vae:
+                print("KL loss: %.5f\n" % kl_l)
+
+            c, s, r = sess.run([tweets, replies, sample])
+            for i in range(5):
+                print("====================================================")
                 # Windows: chcp 65001
                 print(to_eng(c[i], reader.meta['idx2w']), "-->", to_eng(r[:, i], reader.meta['idx2w']))
-                print("====================================")
+                print("True reply: ", to_eng(s[i], reader.meta['idx2w']))
+                print("====================================================")
 
             l_ave = b_ave = d_ave = 0
-            saver.save(sess, args.checkpoint_path + "checkpoint", global_step=0)
+            saver.save(sess, checkpoint_path, global_step=0)
+    output_csv = args.task + "_" + str(args.iterations)
+    if args.use_mutual:
+        output_csv = output_csv + "_m"
+    with open(args.data_dir+"./analytics/" + output_csv + "train.csv", "wb") as f:
+        writer = csv.writer(f)
+        writer.writerow(['Objective loss', 'KLD'])
+        writer.writerows(zip(objective_loss, kl_loss))
     print("DONE")
 
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--learning_rate', default=0.01, type=int)
     parser.add_argument('--rnn_hidden_size', default=512, type=int)
-    parser.add_argument('--layers', default=3, type=int)
     parser.add_argument('--emb_size', default=512, type=int)
     parser.add_argument('--keep_prob', default=0.8, type=float)
     parser.add_argument('--sample_temp', default=0.7, type=float)
     parser.add_argument('--latent_size', default=128, type=int)
     parser.add_argument('--iterations', default=5000, type=int)
-    parser.add_argument('--data_dir', default='./data/', type=str)
-    parser.add_argument('--checkpoint_path', default='./twitter_checkpoints/', type=str)
+    parser.add_argument('--data_dir', default='../data/', type=str)
+    parser.add_argument('--checkpoint_path', default='../checkpoints/', type=str)
     parser.add_argument('--run_converter', default=False, type=bool)
+    parser.add_argument('--use_mutual', default=False, type=bool)
+    parser.add_argument('--use_vae', default=True, type=bool)
+    parser.add_argument('--use_highway', default=True, type=bool)
+    parser.add_argument('--task', default="twitter", type=str)
     args = parser.parse_args()
     return args
 
