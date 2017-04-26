@@ -1,5 +1,5 @@
 import tensorflow as tf
-import numpy as np
+import math
 from tensorflow.contrib.rnn import LSTMStateTuple
 
 class LSTMVAE(object):
@@ -67,7 +67,6 @@ class LSTMVAE(object):
 
         # Here we get the parameters of the latent posterior
         z_mean = tf.add(tf.matmul(c_state.c, w1), b1)
-        # Why does he call the covar square here?
         z_log_sigma_sq = tf.add(tf.matmul(c_state.c, log_sigma_w1), log_sigma_b1)
         # Sample random noise from gaussian
         eps = tf.random_normal(tf.stack([tf.shape(c_state.c)[0], latent_size]), 0, 1, dtype = tf.float32)
@@ -102,12 +101,11 @@ class LSTMVAE(object):
         # Entropy of Q. There should be another expectation but we use the stochastic trick to take
         # one sample of x (the current x) and use that as an approximation (look at bottom of page 9
         # in VAE tutorial)
-        mutual_loss = - 0.5 * np.log(np.det(tf.exp(z_log_sigma_sq))) + emb_size*0.5*(1-np.log(2*np.pi))
-
+        mutual_loss = - 0.5 * tf.log(tf.matrix_determinant(tf.matrix_diag(tf.exp(z_log_sigma_sq)))) + emb_size*0.5*(1-tf.log(2*math.pi))
         # TODO: MAKE SURE EACH COST IS THE CORRECT SIGN!!! CHECK IF WE SHOULD BE GIVING THE SCORE
         # OR THE COST!!!
-        #self.loss = tf.reduce_mean(latent_loss + dec_loss + mutual_loss)
-        self.loss = tf.reduce_mean(latent_loss + dec_loss)
+        self.loss = tf.reduce_mean(latent_loss + dec_loss + mutual_loss)
+        #self.loss = tf.reduce_mean(latent_loss + dec_loss)
 
 
     def sample(self, sample_temp):
