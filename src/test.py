@@ -101,10 +101,10 @@ def main():
     kld = model.get_kl()
     x, y, pred, kl_loss = sess.run([tweets, replies, sample, kld])
 
-    loss = []
+    losses = []
     for i in range(reader.batch_size):
         curr_loss = np.log(np.linalg.norm(np.subtract(np.array(y[i]), np.array(pred[:, i])))**2 + kl_loss)
-        loss.append(curr_loss)
+        losses.append([curr_loss])
         print("====================================================")
         print(to_eng(x[i], reader.meta['idx2w']), "-->", to_eng(pred[:, i], reader.meta['idx2w']))
         print("True reply: ", to_eng(y[i], reader.meta['idx2w']))
@@ -117,10 +117,10 @@ def main():
     output_csv = args.task + "_"
     if args.use_mutual:
         output_csv = output_csv + "_m"
-    with open(args.data_dir+"./analytics/" + output_csv + "test.csv", "wb") as f:
+    with open(args.data_dir+"./analytics/" + output_csv + "test.csv", "w") as f:
         writer = csv.writer(f)
-        writer.writerow(['loss','abg'])
-        writer.writerows(loss)
+        writer.writerow(['Loss'])
+        writer.writerows(losses)
     print("DONE")
 
 def get_args():
