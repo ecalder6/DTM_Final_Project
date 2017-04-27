@@ -138,6 +138,7 @@ def main():
             l_ave = b_ave = d_ave = 0
             if args.use_checkpoint:
                 saver.save(sess, checkpoint_path, global_step=0)
+
     output_csv = args.task + "_" + str(args.iterations)
     if args.use_mutual:
         output_csv = output_csv + "_m"
@@ -148,6 +149,14 @@ def main():
     print("DONE")
 
 def get_args():
+    def str2bool(v):
+        if v.lower() in ('yes', 'true', 't', 'y', '1'):
+            return True
+        if v.lower() in ('no', 'false', 'f', 'n', '0'):
+            return False
+        else:
+            raise argparse.ArgumentTypeError('Boolean value expected.')
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--learning_rate', default=0.01, type=int)
     parser.add_argument('--rnn_hidden_size', default=512, type=int)
@@ -158,13 +167,13 @@ def get_args():
     parser.add_argument('--iterations', default=5000, type=int)
     parser.add_argument('--data_dir', default='../data/', type=str)
     parser.add_argument('--checkpoint_path', default='../twitter_checkpoint/', type=str)
-    parser.add_argument('--run_converter', default=False, type=bool)
-    parser.add_argument('--use_mutual', default=False, type=bool)
-    parser.add_argument('--use_vae', default=True, type=bool)
-    parser.add_argument('--use_highway', default=True, type=bool)
+    parser.add_argument('--run_converter', default=False, type=str2bool)
+    parser.add_argument('--use_mutual', default=False, type=str2bool)
+    parser.add_argument('--use_vae', default=True, type=str2bool)
+    parser.add_argument('--use_highway', default=True, type=str2bool)
     parser.add_argument('--task', default="twitter", type=str)
     parser.add_argument('--update_every', default=100, type=int)
-    parser.add_argument('--use_checkpoint', default=True, type=bool)
+    parser.add_argument('--use_checkpoint', default=True, type=str2bool)
     args = parser.parse_args()
     return args
 
