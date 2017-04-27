@@ -64,8 +64,6 @@ def main():
     reader = Reader(data_dir=args.data_dir)
     reader.read_metadata()
     tweets, replies = reader.read_records()
-
-    seq_max_len = reader.max_length
     learning_rate = args.learning_rate
 
 
@@ -94,8 +92,8 @@ def main():
 
     # Set up checkpoint
     saver = tf.train.Saver()
-    checkpoint_path = args.checkpoint_path + "checkpoint_"+args.task+".ckpt"
-    latest_checkpoint = tf.train.latest_checkpoint(checkpoint_path)
+    #checkpoint_path = args.checkpoint_path + "checkpoint_"+args.task+".ckpt"
+    latest_checkpoint = tf.train.latest_checkpoint(args.checkpoint_path)
     if latest_checkpoint:
         saver.restore(sess, latest_checkpoint)
 
@@ -134,9 +132,12 @@ def main():
                 print(to_eng(c[i], reader.meta['idx2w']), "-->", to_eng(r[:, i], reader.meta['idx2w']))
                 print("True reply: ", to_eng(s[i], reader.meta['idx2w']))
                 print("====================================================")
+                print(c[i])
+                print(r[:,i])
+                exit()
 
             l_ave = b_ave = d_ave = 0
-            saver.save(sess, checkpoint_path, global_step=0)
+            saver.save(sess, args.checkpoint_path, global_step=0)
     output_csv = args.task + "_" + str(args.iterations)
     if args.use_mutual:
         output_csv = output_csv + "_m"
