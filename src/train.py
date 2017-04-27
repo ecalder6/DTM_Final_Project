@@ -142,7 +142,7 @@ def main():
     output_csv = args.task + "_" + str(args.iterations)
     if args.use_mutual:
         output_csv = output_csv + "_m"
-    with open(args.data_dir+"analytics/" + output_csv + "train.csv", "w") as f:
+    with open(args.data_dir+"analytics/" + output_csv + "train.csv", "w", newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['Objective loss', 'KLD'])
         writer.writerows(zip(objective_loss, kl_loss))
