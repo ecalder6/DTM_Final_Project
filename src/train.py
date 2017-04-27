@@ -93,15 +93,15 @@ def main():
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
     # Set up checkpoint
-    saver = tf.train.Saver()
-    checkpoint_path = args.checkpoint_path + "checkpoint_"+args.task+".ckpt"
-    latest_checkpoint = tf.train.latest_checkpoint(checkpoint_path)
-    if latest_checkpoint:
-        saver.restore(sess, latest_checkpoint)
+    if args.use_checkpoint:
+        saver = tf.train.Saver()
+        checkpoint_path = args.checkpoint_path
+        latest_checkpoint = tf.train.latest_checkpoint(checkpoint_path)
+        if latest_checkpoint:
+            saver.restore(sess, latest_checkpoint)
 
     ### Main loop for training
     l_ave = b_ave = d_ave = 0
-    UPDATE_EVERY = 10
     objective_loss = []
     kl_loss = []
     duration = time.time()
@@ -120,7 +120,7 @@ def main():
         objective_loss.append(obj_l)
 
 
-        if step % UPDATE_EVERY == 0:
+        if step % args.update_every == 0:
             print("\nIteration: ", step+1)
             print("Duration: ", time.time()-duration )
             print("Objective loss: %.3f" % obj_l)
@@ -136,11 +136,12 @@ def main():
                 print("====================================================")
 
             l_ave = b_ave = d_ave = 0
-            saver.save(sess, checkpoint_path, global_step=0)
+            if args.use_checkpoint:
+                saver.save(sess, checkpoint_path, global_step=0)
     output_csv = args.task + "_" + str(args.iterations)
     if args.use_mutual:
         output_csv = output_csv + "_m"
-    with open(args.data_dir+"./analytics/" + output_csv + "train.csv", "wb") as f:
+    with open(args.data_dir+"analytics/" + output_csv + "train.csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(['Objective loss', 'KLD'])
         writer.writerows(zip(objective_loss, kl_loss))
@@ -156,12 +157,14 @@ def get_args():
     parser.add_argument('--latent_size', default=128, type=int)
     parser.add_argument('--iterations', default=5000, type=int)
     parser.add_argument('--data_dir', default='../data/', type=str)
-    parser.add_argument('--checkpoint_path', default='../checkpoints/', type=str)
+    parser.add_argument('--checkpoint_path', default='../twitter_checkpoint/', type=str)
     parser.add_argument('--run_converter', default=False, type=bool)
     parser.add_argument('--use_mutual', default=False, type=bool)
     parser.add_argument('--use_vae', default=True, type=bool)
     parser.add_argument('--use_highway', default=True, type=bool)
     parser.add_argument('--task', default="twitter", type=str)
+    parser.add_argument('--update_every', default=100, type=int)
+    parser.add_argument('--use_checkpoint', default=True, type=bool)
     args = parser.parse_args()
     return args
 
