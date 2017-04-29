@@ -73,13 +73,16 @@ def main():
     model = LSTMVAE(tweets, \
                 reader.batch_size, args.emb_size, \
                 args.latent_size, reader.vocab_size, reader.max_length, \
-                use_vae=args.use_vae, use_highway=args.use_highway)
+                use_vae=args.use_vae, use_highway=args.use_highway, mutual_lambda=args.mutual_loss_lambda)
     out = model.get_outputs(replies)
 
     loss = model.get_loss(replies, out, use_mutual=args.use_mutual)
     kld = None
+    mutual_loss = None
     if args.use_vae:
         kld = model.get_kl()
+    if args.use_mutual:
+        mutual_loss = model.get_mutual_loss()
     lr = tf.placeholder_with_default(learning_rate, [], name="lr")
     train_op = model.train(lr, loss)
     sample = model.sample(args.sample_temp)
@@ -104,15 +107,17 @@ def main():
     l_ave = b_ave = d_ave = 0
     objective_loss = []
     kl_loss = []
+    mutual_losses = []
     duration = time.time()
     for step in range(args.iterations):
         obj_l = kl_l = None
         if args.use_vae:
             # Run one iteration for training and save the loss
-            _, obj_l, kl_l = sess.run([train_op, loss, kld], {
+            _, obj_l, kl_l, m_l = sess.run([train_op, loss, kld, mutual_losses], {
                 lr: learning_rate
             })
             kl_loss.append(kl_l)
+            mutual_losses.append(m_l)
         else:
             _, obj_l = sess.run([train_op, loss], {
                 lr: learning_rate
@@ -142,10 +147,18 @@ def main():
     output_csv = args.task + "_" + str(args.iterations)
     if args.use_mutual:
         output_csv = output_csv + "_m"
+
     with open(args.data_dir+"analytics/" + output_csv + "train.csv", "w", newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(['Objective loss', 'KLD'])
-        writer.writerows(zip(objective_loss, kl_loss))
+        if len(mutual_losses):
+            writer.writerow(['Objective loss', 'KLD', 'Mutual loss'])
+            writer.writerows(zip(objective_loss, kl_loss, mutual_losses))
+        if len(kl_loss):
+            writer.writerow(['Objective loss', 'KLD'])
+            writer.writerows(zip(objective_loss, kl_loss))
+        else:
+            writer.writerow(['Objective loss'])
+            writer.writerows(zip(objective_loss))
     print("DONE")
 
 def get_args():
@@ -158,7 +171,8 @@ def get_args():
             raise argparse.ArgumentTypeError('Boolean value expected.')
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--learning_rate', default=0.01, type=int)
+    parser.add_argument('--learning_rate', default=0.01, type=float)
+    parser.add_argument('--mutual_loss_lambda', default=0.1, type=float)
     parser.add_argument('--rnn_hidden_size', default=512, type=int)
     parser.add_argument('--emb_size', default=512, type=int)
     parser.add_argument('--keep_prob', default=0.8, type=float)

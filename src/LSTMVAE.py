@@ -8,7 +8,7 @@ class LSTMVAE(object):
     '''
 
     def __init__(self, x, batch_size, emb_size, \
-        latent_size, vocab_size, seq_max_len, use_vae = True, use_highway = True):
+        latent_size, vocab_size, seq_max_len, use_vae = True, use_highway = True, mutual_lambda = 0.1):
         '''
         Initializes a LSTM-VAE by setting up the encoder, VAE, and decoder
 
@@ -27,6 +27,7 @@ class LSTMVAE(object):
         self._emb_size = emb_size
         self._max_len = seq_max_len
         self._use_vae = use_vae
+        self.mutual_lambda = mutual_lambda
 
         ### Encoder ###
         # emb_size is the size of the internal state in each cell.
@@ -129,9 +130,7 @@ class LSTMVAE(object):
         # Latent loss
         # latent loss from the other dude's code
         if self._use_vae:
-            latent_loss = -0.5 * tf.reduce_sum(self._emb_size + self._z_cov
-                                           - tf.square(self._z_mean)
-                                           - tf.exp(self._z_cov), 1)
+            latent_loss = self.get_kl()
             # latent_loss = -0.5 * (tf.reduce_sum(tf.exp(self._z_cov))
             #                                    + tf.reduce_sum(tf.square(self._z_mean))
             #                                    - self._emb_size
@@ -141,7 +140,7 @@ class LSTMVAE(object):
                 # Entropy of Q. There should be another expectation but we use the stochastic trick to take
                 # one sample of x (the current x) and use that as an approximation (look at bottom of page 9
                 # in VAE tutorial)
-                mutual_loss = - 0.5 * tf.log(tf.matrix_determinant(tf.matrix_diag(tf.exp(self._z_cov)))) - self._emb_size*0.5*(1+tf.log(2*math.pi))
+                mutual_loss = self.get_mutual_loss()
 
             loss = tf.reduce_mean(latent_loss + dec_loss + mutual_loss) if use_mutual else tf.reduce_mean(latent_loss + dec_loss)
         else:
@@ -154,6 +153,10 @@ class LSTMVAE(object):
                                            - tf.exp(self._z_cov), 1))
         return latent_loss
 
+    def get_mutual_loss(self):
+        sign = -1
+        mutual_loss = sign * self.mutual_lambda * (0.5 * tf.log(tf.matrix_determinant(tf.matrix_diag(tf.exp(self._z_cov)))) + self._emb_size*0.5*(1+tf.log(2*math.pi)))
+        return mutual_loss
 
     def sample(self, sample_temp):
         '''
