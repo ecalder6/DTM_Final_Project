@@ -11,13 +11,14 @@ class Reader(object):
     Reader class
     '''
 
-    def __init__(self, data_dir='', max_length=20, min_length=1, task='twitter'):
+    def __init__(self, data_dir='', max_length=20, min_length=1, task='twitter', batch_size=100):
         self.data_dir = data_dir
         self.max_length = max_length
         self.min_length = min_length
         self._task = task
+        self.batch_size = batch_size
 
-    def read_records(self, files=None, train=True, batch_size=100, min_after_dequeue=10000):
+    def read_records(self, files=None, train=True, min_after_dequeue=10000):
         d = self.data_dir + 'train/' + self._task + '.tfrecords' if train else self.data_dir + 'test/' + self._task + '.tfrecords'
         proto_files = glob.glob(d)
         # Construct a queue of records to read
@@ -37,8 +38,8 @@ class Reader(object):
         features = tf.parse_single_example(
             serialized_example,
             features=attributes)
-        capacity = min_after_dequeue + 3 * batch_size
-        self.batch_size = batch_size
+        capacity = min_after_dequeue + 3 * self.batch_size
+        
         if self._task == 'twitter':
             tweets, replies = tf.train.shuffle_batch(
                 [features[k] for k in attributes.keys()],
@@ -49,7 +50,7 @@ class Reader(object):
             lines = tf.train.shuffle_batch(
                 [features[k] for k in attributes.keys()],
                 batch_size=self.batch_size, capacity=capacity, min_after_dequeue=min_after_dequeue)
-            return lines
+            return lines, lines
 
     def read_metadata(self, meta_dir='metadata'):
         self.meta = pickle.load( open( self.data_dir + "metadata/" + self._task + "_" +  meta_dir, "rb" ) )

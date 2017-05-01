@@ -57,12 +57,7 @@ def main():
     # Set up and run reader
     reader = Reader(data_dir=args.data_dir)
     reader.read_metadata()
-    lines, responses = None, None
-    if args.task == "twitter":
-        lines, responses = reader.read_records()
-    elif args.task == "movie":
-        lines = reader.read_records()
-        responses = lines
+    lines, replies = reader.read_records()
     learning_rate = args.learning_rate
 
 
@@ -71,9 +66,9 @@ def main():
                 reader.batch_size, args.emb_size, \
                 args.latent_size, reader.vocab_size, reader.max_length, \
                 use_vae=args.use_vae, use_highway=args.use_highway, mutual_lambda=args.mutual_loss_lambda)
-    out = model.get_outputs(responses)
+    out = model.get_outputs(replies)
 
-    loss = model.get_loss(responses, out, use_mutual=args.use_mutual)
+    loss = model.get_loss(replies, out, use_mutual=args.use_mutual)
     kld = None
     mutual_loss = None
     if args.use_vae:
@@ -129,7 +124,7 @@ def main():
             if args.use_vae:
                 print("KL loss: %.5f\n" % kl_l)
 
-            c, s, r = sess.run([lines, responses, sample])
+            c, s, r = sess.run([lines, replies, sample])
             for i in range(5):
                 print("====================================================")
                 # Windows: chcp 65001
@@ -138,6 +133,7 @@ def main():
                 print("====================================================")
                 print(c[i])
                 print(r[:,i])
+                exit()
 
             l_ave = b_ave = d_ave = 0
             saver.save(sess, args.checkpoint_path, global_step=0)
