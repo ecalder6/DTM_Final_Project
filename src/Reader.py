@@ -31,17 +31,25 @@ class Reader(object):
         attributes = None
         if self._task == 'twitter':
             attributes = { 'question': tf.FixedLenFeature([self.max_length], tf.int64), 'answer': tf.FixedLenFeature([self.max_length], tf.int64), }
+        elif self._task == 'movie':
+            attributes = { 'line': tf.FixedLenFeature([self.max_length], tf.int64)}
 
         features = tf.parse_single_example(
             serialized_example,
             features=attributes)
         capacity = min_after_dequeue + 3 * batch_size
         self.batch_size = batch_size
-        tweets, replies = tf.train.shuffle_batch(
-            [features[k] for k in attributes.keys()],
-            #[features['question'], features['answer']],
-            batch_size=self.batch_size, capacity=capacity, min_after_dequeue=min_after_dequeue)
-        return tweets, replies
+        if self._task == 'twitter':
+            tweets, replies = tf.train.shuffle_batch(
+                [features[k] for k in attributes.keys()],
+                #[features['question'], features['answer']],
+                batch_size=self.batch_size, capacity=capacity, min_after_dequeue=min_after_dequeue)
+            return tweets, replies
+        elif self._task == 'movie':
+            lines = tf.train.shuffle_batch(
+                [features[k] for k in attributes.keys()],
+                batch_size=self.batch_size, capacity=capacity, min_after_dequeue=min_after_dequeue)
+            return lines
 
     def read_metadata(self, meta_dir='metadata'):
         self.meta = pickle.load( open( self.data_dir + "metadata/" + self._task + "_" +  meta_dir, "rb" ) )

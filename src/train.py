@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 from Reader import Reader
-from Converter import Converter
 from LSTMVAE import LSTMVAE
 
 import os, random, time, glob, pickle
@@ -55,25 +54,26 @@ def to_eng(ids, ix_to_word):
 def main():
     args = get_args()
 
-    # if args.run_converter:
-    #     converter = Converter(input_filename = args.data_dir + 'twitter.txt', output_filename = args.data_dir + 'twitter.tfrecords', meta_file = args.data_dir + 'metadata')
-    #     converter.process_data()
-
     # Set up and run reader
     reader = Reader(data_dir=args.data_dir)
     reader.read_metadata()
-    tweets, replies = reader.read_records()
+    lines, responses = None, None
+    if args.task == "twitter":
+        lines, responses = reader.read_records()
+    elif args.task == "movie":
+        lines = reader.read_records()
+        responses = lines
     learning_rate = args.learning_rate
 
 
     # Set up model
-    model = LSTMVAE(tweets, \
+    model = LSTMVAE(lines, \
                 reader.batch_size, args.emb_size, \
                 args.latent_size, reader.vocab_size, reader.max_length, \
                 use_vae=args.use_vae, use_highway=args.use_highway, mutual_lambda=args.mutual_loss_lambda)
-    out = model.get_outputs(replies)
+    out = model.get_outputs(responses)
 
-    loss = model.get_loss(replies, out, use_mutual=args.use_mutual)
+    loss = model.get_loss(responses, out, use_mutual=args.use_mutual)
     kld = None
     mutual_loss = None
     if args.use_vae:
@@ -129,7 +129,7 @@ def main():
             if args.use_vae:
                 print("KL loss: %.5f\n" % kl_l)
 
-            c, s, r = sess.run([tweets, replies, sample])
+            c, s, r = sess.run([lines, responses, sample])
             for i in range(5):
                 print("====================================================")
                 # Windows: chcp 65001
@@ -138,7 +138,6 @@ def main():
                 print("====================================================")
                 print(c[i])
                 print(r[:,i])
-                exit()
 
             l_ave = b_ave = d_ave = 0
             saver.save(sess, args.checkpoint_path, global_step=0)
@@ -179,7 +178,6 @@ def get_args():
     parser.add_argument('--iterations', default=5000, type=int)
     parser.add_argument('--data_dir', default='../data/', type=str)
     parser.add_argument('--checkpoint_path', default='../twitter_checkpoint/', type=str)
-    parser.add_argument('--run_converter', default=False, type=str2bool)
     parser.add_argument('--use_mutual', default=False, type=str2bool)
     parser.add_argument('--use_vae', default=True, type=str2bool)
     parser.add_argument('--use_highway', default=True, type=str2bool)
@@ -190,4 +188,6 @@ def get_args():
     return args
 
 if __name__ == "__main__":
+    # Sample command for movie:
+    #   python train.py --checkpoint_path=../movie_lstm_checkpoint/ --use_mutual=False --use_vae=False --use_highway=False --task=movie
     main()

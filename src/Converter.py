@@ -10,7 +10,7 @@ import numpy as np
 import tensorflow as tf
 
 class Converter(object):
-    def __init__(self, input_filename='', output_filename='', meta_file='', max_length=20, min_length=1, vocab_size=30000):
+    def __init__(self, input_filename='', output_filename='', meta_file='', max_length=20, min_length=1, vocab_size=30000, data_type='twitter'):
         self.en_whitelist = 'abcdefghijklmnopqrstuvwxyz '
         self.unk_token = 'unk'
         self.input_filename = input_filename
@@ -19,16 +19,50 @@ class Converter(object):
         self.min_length = min_length
         self.vocab_size = vocab_size
         self.meta_file = meta_file
+        self.data_type = data_type
 
-    def process_data(self):
-        '''
-        Takes in a text file and converts it into a tfrecord
-        '''
+    def process_movies(self):
+        print("Begin tokenization")
+        translate_table = dict((ord(char), None) for char in string.punctuation)
+        with open(self.input_filename, encoding="ISO-8859-1") as f:
+            tokenized = []
+            for line in f.readlines():
+                line = line.split(" +++$+++ ")[4]
+                line = line.translate(translate_table)
+                tokens = nltk.word_tokenize(line)
+                if len(tokens) > self.max_length:
+                    continue
+                tokenized.append(tokens)
+            print("Finished tokenization")
+            print(tokens[:5])
+            print("Indexing")
+            idx2w, w2idx, vocab = self.index(tokenized)
+            print("Padding")
+            idx_words = self.zero_pad(tokenized, w2idx, self.max_length)
+
+            print(idx_words[:5])
+
+            # count of unknowns
+
+            unk_count = (idx_words == 1).sum()
+            # count of words
+
+            word_count = (idx_words > 1).sum()
+            # % unknown
+
+            print('% unknown : {}'.format(100 * (unk_count/word_count)))
+
+            print('\n >> Convert to tfrecords and write to disk')        
+            self.write_to_tfrecords(self.output_filename, idx_words)
+
+            return w2idx, idx2w, vocab
+    
+    def process_tweets(self):
         maxq = maxa = self.max_length
         minq = mina = self.min_length
         tknzr = nltk.tokenize.TweetTokenizer(strip_handles=True, reduce_len=True)
         translate_table = dict((ord(char), None) for char in string.punctuation)
-        print("Beging tokenization")
+        print("Begin tokenization")
         with open(self.input_filename, encoding="utf8") as f:
             i = 0
             # Skip 2 lines at a time
@@ -56,7 +90,7 @@ class Converter(object):
             print("Indexing")
             idx2w, w2idx, vocab = self.index(qtokenized + atokenized)
             print("Padding")
-            idx_q, idx_a = self.zero_pad(qtokenized, atokenized, w2idx, maxq, maxa)
+            idx_q, idx_a = self.zero_pad(qtokenized, w2idx, maxq, atokenized, maxa)
 
             # count of unknowns
 
@@ -71,16 +105,28 @@ class Converter(object):
             print('\n >> Convert to tfrecords and write to disk')        
             self.write_to_tfrecords(self.output_filename, idx_q, idx_a)
 
-            # let us now save the necessary dictionaries
-            metadata = {
-                    'w2idx' : w2idx,
-                    'idx2w' : idx2w,
-                    'vocab' : vocab,
-                        }
+            return w2idx, idx2w, vocab
 
-            # write to disk : data control dictionaries
-            with open(self.meta_file, 'wb') as f:
-                pickle.dump(metadata, f)
+    def process_data(self):
+        '''
+        Takes in a text file and converts it into a tfrecord
+        '''
+        if self.data_type == "twitter":
+            w2idx, idx2w, vocab = self.process_tweets()
+
+        elif self.data_type == "movie":
+            w2idx, idx2w, vocab = self.process_movies()
+
+        # let us now save the necessary dictionaries
+        metadata = {
+                'w2idx' : w2idx,
+                'idx2w' : idx2w,
+                'vocab' : vocab,
+                    }
+
+        # write to disk : data control dictionaries
+        with open(self.meta_file, 'wb') as f:
+            pickle.dump(metadata, f)
 
     def index(self, tokenized_sentences):
         '''
@@ -103,7 +149,7 @@ class Converter(object):
         vocab = list(map(lambda x: x[0], ["_"] + [self.unk_token] + vocab))
         return index2word, word2index, vocab
 
-    def zero_pad(self, qtokenized, atokenized, w2idx, maxq, maxa):
+    def zero_pad(self, qtokenized, w2idx, maxq, atokenized=None, maxa=None):
         '''
         create the final dataset : 
         - convert list of items to arrays of indices
@@ -116,34 +162,47 @@ class Converter(object):
 
         # numpy arrays to store indices
         idx_q = np.zeros([data_len, maxq], dtype=np.int32) 
-        idx_a = np.zeros([data_len, maxa], dtype=np.int32)
+        if atokenized and maxa:
+            idx_a = np.zeros([data_len, maxa], dtype=np.int32)
 
         for i in range(data_len):
             q_indices = self.pad_seq(qtokenized[i], w2idx, maxq)
-            a_indices = self.pad_seq(atokenized[i], w2idx, maxa)
+            if atokenized and maxa:
+                a_indices = self.pad_seq(atokenized[i], w2idx, maxa)
 
             #print(len(idx_q[i]), len(q_indices))
             #print(len(idx_a[i]), len(a_indices))
             idx_q[i] = np.array(q_indices)
-            idx_a[i] = np.array(a_indices)
-
-        return idx_q, idx_a
+            if atokenized and maxa:
+                idx_a[i] = np.array(a_indices)
+        if atokenized and maxa:
+            return idx_q, idx_a
+        else:
+            return idx_q
     def int64_feature(self, value):
         return tf.train.Feature(int64_list=tf.train.Int64List(value=value))
 
-    def write_to_tfrecords(self, output_filename, idx_q, idx_a):
+    def write_to_tfrecords(self, output_filename, idx_q, idx_a=None):
         """Converts a dataset to tfrecords."""
         writer = tf.python_io.TFRecordWriter(output_filename)
 
-        for q, a in zip(idx_q, idx_a):
-            if not len(q):
-                print("NOT LEN Q!")
-            if not len(a):
-                print("NOT LEN A!")
-            example = tf.train.Example(features=tf.train.Features(feature={
-                'question': self.int64_feature(q),
-                'answer': self.int64_feature(a)}))
-            writer.write(example.SerializeToString())
+        if idx_a:
+            for q, a in zip(idx_q, idx_a):
+                if not len(q):
+                    print("NOT LEN Q!")
+                if not len(a):
+                    print("NOT LEN A!")
+                example = tf.train.Example(features=tf.train.Features(feature={
+                    'question': self.int64_feature(q),
+                    'answer': self.int64_feature(a)}))
+                writer.write(example.SerializeToString())
+        else:
+            for q in idx_q:
+                if not len(q):
+                    print("NOT LEN Q!")
+                example = tf.train.Example(features=tf.train.Features(feature={
+                    'line': self.int64_feature(q)}))
+                writer.write(example.SerializeToString())
         writer.close()
 
     def pad_seq(self, seq, lookup, maxlen):
@@ -160,6 +219,3 @@ class Converter(object):
             else:
                 indices.append(lookup[self.unk_token])
         return indices + [0]*(maxlen - len(seq))
-
-    
-    
