@@ -1,0 +1,8 @@
+
+Iteration:  1
+Duration:  6.483060598373413
+Objective loss: 133.518
+KL loss: -0.00904
+
+====================================================
+uve had good tweets noticed ur an undergrad in if u unk want unk 4 get in touch  --> 

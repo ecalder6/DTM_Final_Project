@@ -15,7 +15,6 @@ import operator
 import argparse
 import csv
 
-
 def to_eng(ids, ix_to_word):
     output = ""
     for id in ids:
@@ -110,10 +109,10 @@ def main():
     mutual_losses = []
     duration = time.time()
     for step in range(args.iterations):
-        obj_l = kl_l = None
+        obj_l, kl_l, m_l = None, None, None
         if args.use_vae:
             # Run one iteration for training and save the loss
-            _, obj_l, kl_l, m_l = sess.run([train_op, loss, kld, mutual_losses], {
+            _, obj_l, kl_l, m_l = sess.run([train_op, loss, kld, mutual_loss], {
                 lr: learning_rate
             })
             kl_loss.append(kl_l)
