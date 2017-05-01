@@ -120,6 +120,8 @@ class LSTMVAE(object):
                                 swap_memory=True, dtype=tf.float32)
         return dec_out
 
+    # def compute_loss(self, truth, pred):
+
 
     def get_loss(self, y, output, use_mutual=True):
         ### Cost ###
@@ -143,6 +145,8 @@ class LSTMVAE(object):
                 mutual_loss = self.get_mutual_loss()
 
             loss = tf.reduce_mean(latent_loss + dec_loss + mutual_loss) if use_mutual else tf.reduce_mean(latent_loss + dec_loss)
+            # NOTE: ADDED HYPERPARAMETERS FOR LATENT AND MUTUAL
+            # loss = tf.reduce_mean(dec_loss + 0.01*(latent_loss + mutual_loss)) if use_mutual else tf.reduce_mean(0.01*latent_loss + dec_loss)
         else:
             loss = tf.reduce_mean(dec_loss)
         return loss
@@ -218,10 +222,10 @@ class LSTMVAE(object):
             next_loop_state = None
             return elements_finished, next_input, next_cell_state, emit_output, next_loop_state
 
-        with tf.variable_scope("decoder"):
+        with tf.variable_scope("decoder", reuse=None):
             outputs_ta, _, _ = tf.nn.raw_rnn(self.dec_cell, loop_fn, swap_memory=True)
             sample = outputs_ta.stack()
-            return sample
+        return sample
 
     def train(self, lr, loss):
         tvars = tf.trainable_variables()

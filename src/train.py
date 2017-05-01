@@ -63,8 +63,6 @@ def main():
     reader = Reader(data_dir=args.data_dir)
     reader.read_metadata()
     tweets, replies = reader.read_records()
-
-    seq_max_len = reader.max_length
     learning_rate = args.learning_rate
 
 
@@ -138,11 +136,12 @@ def main():
                 print(to_eng(c[i], reader.meta['idx2w']), "-->", to_eng(r[:, i], reader.meta['idx2w']))
                 print("True reply: ", to_eng(s[i], reader.meta['idx2w']))
                 print("====================================================")
+                print(c[i])
+                print(r[:,i])
+                exit()
 
             l_ave = b_ave = d_ave = 0
-            if args.use_checkpoint:
-                saver.save(sess, checkpoint_path, global_step=0)
-
+            saver.save(sess, args.checkpoint_path, global_step=0)
     output_csv = args.task + "_" + str(args.iterations)
     if args.use_mutual:
         output_csv = output_csv + "_m"
