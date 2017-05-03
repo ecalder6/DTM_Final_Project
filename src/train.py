@@ -103,13 +103,18 @@ def main():
     duration = time.time()
     for step in range(args.iterations):
         obj_l, kl_l, m_l = None, None, None
-        if args.use_vae:
-            # Run one iteration for training and save the loss
+        # Run one iteration for training and save the loss
+        if args.use_mutual:
             _, obj_l, kl_l, m_l = sess.run([train_op, loss, kld, mutual_loss], {
                 lr: learning_rate
             })
             kl_loss.append(kl_l)
             mutual_losses.append(m_l)
+        elif args.use_vae:
+            _, obj_l, kl_l = sess.run([train_op, loss, kld], {
+                lr: learning_rate
+            })
+            kl_loss.append(kl_l)
         else:
             _, obj_l = sess.run([train_op, loss], {
                 lr: learning_rate
@@ -133,10 +138,11 @@ def main():
                 print("====================================================")
                 print(c[i])
                 print(r[:,i])
-                exit()
+                
 
             l_ave = b_ave = d_ave = 0
-            saver.save(sess, args.checkpoint_path, global_step=0)
+            saver.save(sess, args.checkpoint_path + "checkpoint", global_step=0)
+            exit()
     output_csv = args.task + "_" + str(args.iterations)
     if args.use_mutual:
         output_csv = output_csv + "_m"
@@ -173,7 +179,7 @@ def get_args():
     parser.add_argument('--latent_size', default=128, type=int)
     parser.add_argument('--iterations', default=5000, type=int)
     parser.add_argument('--data_dir', default='../data/', type=str)
-    parser.add_argument('--checkpoint_path', default='../twitter_checkpoint/', type=str)
+    parser.add_argument('--checkpoint_path', default='../twitter_checkpoint_vae_highway/', type=str)
     parser.add_argument('--use_mutual', default=False, type=str2bool)
     parser.add_argument('--use_vae', default=True, type=str2bool)
     parser.add_argument('--use_highway', default=True, type=str2bool)

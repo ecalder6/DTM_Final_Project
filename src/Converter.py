@@ -81,7 +81,7 @@ class Converter(object):
                     skip = True
                     i += 1
                     continue
-                if i % 2:
+                if not i % 2:
                     qtokenized.append(tokens)
                 else:
                     atokenized.append(tokens)
@@ -186,7 +186,7 @@ class Converter(object):
         """Converts a dataset to tfrecords."""
         writer = tf.python_io.TFRecordWriter(output_filename)
 
-        if idx_a:
+        if idx_a != None:
             for q, a in zip(idx_q, idx_a):
                 if not len(q):
                     print("NOT LEN Q!")
