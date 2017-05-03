@@ -50,7 +50,7 @@ class Reader(object):
             lines = tf.train.shuffle_batch(
                 [features[k] for k in attributes.keys()],
                 batch_size=self.batch_size, capacity=capacity, min_after_dequeue=min_after_dequeue)
-            return lines, lines
+            return lines
 
     def read_metadata(self, meta_dir='metadata'):
         self.meta = pickle.load( open( self.data_dir + "metadata/" + self._task + "_" +  meta_dir, "rb" ) )

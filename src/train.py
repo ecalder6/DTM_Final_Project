@@ -55,11 +55,15 @@ def main():
     args = get_args()
 
     # Set up and run reader
-    reader = Reader(data_dir=args.data_dir)
+    reader = Reader(task=args.task, data_dir=args.data_dir)
     reader.read_metadata()
-    lines, replies = reader.read_records()
+    lines, replies = None, None
+    if args.task == "twitter":
+        lines, replies = reader.read_records()
+    elif args.task == "movie":
+        lines = reader.read_records()
+        replies = lines
     learning_rate = args.learning_rate
-
 
     # Set up model
     model = LSTMVAE(lines, \
