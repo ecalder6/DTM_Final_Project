@@ -119,29 +119,30 @@ def main():
     for step in range(args.iterations):
         obj_l, kl_l, m_l, cov = None, None, None, None
         # Run one iteration for training and save the loss
-        if args.use_mutual:
-            _, obj_l, kl_l, m_l, cov = sess.run([train_op, loss, kld, mutual_loss, model._z_cov], {
-                lr: learning_rate
-            })
-            kl_loss.append(kl_l)
-            mutual_losses.append(m_l)
-        elif args.use_vae:
-            _, obj_l, kl_l, cov = sess.run([train_op, loss, kld, model._z_cov], {
-                lr: learning_rate
-            })
-            kl_loss.append(kl_l)
-        else:
-            _, obj_l = sess.run([train_op, loss], {
-                lr: learning_rate
-            })
+        # if args.use_mutual:
+        #     _, obj_l, kl_l, m_l, cov = sess.run([train_op, loss, kld, mutual_loss, model._z_cov], {
+        #         lr: learning_rate
+        #     })
+        #     kl_loss.append(kl_l)
+        #     mutual_losses.append(m_l)
+        # elif args.use_vae:
+        #     _, obj_l, kl_l, cov = sess.run([train_op, loss, kld, model._z_cov], {
+        #         lr: learning_rate
+        #     })
+        #     kl_loss.append(kl_l)
+        # else:
+        _, obj_l = sess.run([train_op, loss], {
+            lr: learning_rate
+        })
+
         objective_loss.append(obj_l)
 
         if step % args.update_every == 0:
             print("\nIteration: ", step+1)
             print("Duration: ", time.time()-duration )
             print("Objective loss: %.3f" % obj_l)
-            if args.use_vae:
-                print("KL loss: %.5f\n" % kl_l)
+            # if args.use_vae:
+            #     print("KL loss: %.5f\n" % kl_l)
 
             c, s, r = sess.run([lines, replies, sample])
             for i in range(5):
@@ -153,18 +154,18 @@ def main():
                 # print(c[i])
                 # print(r[:,i])
 
-            if len(mutual_losses):
-                writer.writerow(['Objective loss', 'KLD', 'Mutual loss'])
-                writer.writerows(zip(objective_loss, kl_loss, mutual_losses))
-            if len(kl_loss):
-                writer.writerow(['Objective loss', 'KLD'])
-                writer.writerows(zip(objective_loss, kl_loss))
-            else:
-                writer.writerow(['Objective loss'])
-                writer.writerows(zip(objective_loss))
+            # if len(mutual_losses):
+            #     writer.writerow(['Objective loss', 'KLD', 'Mutual loss'])
+            #     writer.writerows(zip(objective_loss, kl_loss, mutual_losses))
+            # if len(kl_loss):
+            #     writer.writerow(['Objective loss', 'KLD'])
+            #     writer.writerows(zip(objective_loss, kl_loss))
+            # else:
+            writer.writerow(['Objective loss'])
+            writer.writerows(zip(objective_loss))
 
-            if args.use_mutual or args.use_vae:
-                np.savetxt(cov_file, cov[:10])
+            # if args.use_mutual or args.use_vae:
+            #     np.savetxt(cov_file, cov[:10])
             # c, s, r = sess.run([tf.constant([[3., 3.]]), tf.constant([[3., 3.]]), sample])
             # l_ave = b_ave = d_ave = 0
             if args.use_checkpoint:
