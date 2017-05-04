@@ -18,6 +18,8 @@ def main():
     checkpoint_path = args.checkpoint_path
     latest_checkpoint = tf.train.latest_checkpoint(checkpoint_path)
     saver.restore(sess, latest_checkpoint)
+    sample = tf.get_collection('vars')
+    print(sample)
 
 def get_args():
     parser = argparse.ArgumentParser()

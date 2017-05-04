@@ -13,6 +13,7 @@ from functools import reduce
 import operator
 import argparse
 import csv
+import numpy as np
 
 def to_eng(ids, ix_to_word):
     output = ""
@@ -105,17 +106,27 @@ def main():
     kl_loss = []
     mutual_losses = []
     duration = time.time()
+
+    output_csv = args.task + "_" + str(args.iterations)
+    if args.use_mutual:
+        output_csv = output_csv + "_m"
+    f = open(args.data_dir+"analytics/" + output_csv + "train.csv", "w", newline='')
+    writer = csv.writer(f)
+
+    if args.use_mutual or args.use_vae:
+        cov_file = open(args.data_dir+"analytics/cov.txt", "wb")
+
     for step in range(args.iterations):
-        obj_l, kl_l, m_l = None, None, None
+        obj_l, kl_l, m_l, cov = None, None, None, None
         # Run one iteration for training and save the loss
         if args.use_mutual:
-            _, obj_l, kl_l, m_l = sess.run([train_op, loss, kld, mutual_loss], {
+            _, obj_l, kl_l, m_l, cov = sess.run([train_op, loss, kld, mutual_loss, model._z_cov], {
                 lr: learning_rate
             })
             kl_loss.append(kl_l)
             mutual_losses.append(m_l)
         elif args.use_vae:
-            _, obj_l, kl_l = sess.run([train_op, loss, kld], {
+            _, obj_l, kl_l, cov = sess.run([train_op, loss, kld, model._z_cov], {
                 lr: learning_rate
             })
             kl_loss.append(kl_l)
@@ -124,7 +135,6 @@ def main():
                 lr: learning_rate
             })
         objective_loss.append(obj_l)
-
 
         if step % args.update_every == 0:
             print("\nIteration: ", step+1)
@@ -140,28 +150,33 @@ def main():
                 print(to_eng(c[i], reader.meta['idx2w']), "-->", to_eng(r[:, i], reader.meta['idx2w']))
                 print("True reply: ", to_eng(s[i], reader.meta['idx2w']))
                 print("====================================================")
-                print(c[i])
-                print(r[:,i])
-                
+                # print(c[i])
+                # print(r[:,i])
 
-            l_ave = b_ave = d_ave = 0
-            saver.save(sess, args.checkpoint_path + "checkpoint", global_step=0)
-            exit()
-    output_csv = args.task + "_" + str(args.iterations)
-    if args.use_mutual:
-        output_csv = output_csv + "_m"
+            if len(mutual_losses):
+                writer.writerow(['Objective loss', 'KLD', 'Mutual loss'])
+                writer.writerows(zip(objective_loss, kl_loss, mutual_losses))
+            if len(kl_loss):
+                writer.writerow(['Objective loss', 'KLD'])
+                writer.writerows(zip(objective_loss, kl_loss))
+            else:
+                writer.writerow(['Objective loss'])
+                writer.writerows(zip(objective_loss))
 
-    with open(args.data_dir+"analytics/" + output_csv + "train.csv", "w", newline='') as f:
-        writer = csv.writer(f)
-        if len(mutual_losses):
-            writer.writerow(['Objective loss', 'KLD', 'Mutual loss'])
-            writer.writerows(zip(objective_loss, kl_loss, mutual_losses))
-        if len(kl_loss):
-            writer.writerow(['Objective loss', 'KLD'])
-            writer.writerows(zip(objective_loss, kl_loss))
-        else:
-            writer.writerow(['Objective loss'])
-            writer.writerows(zip(objective_loss))
+            if args.use_mutual or args.use_vae:
+                np.savetxt(cov_file, cov[:10])
+            # c, s, r = sess.run([tf.constant([[3., 3.]]), tf.constant([[3., 3.]]), sample])
+            # l_ave = b_ave = d_ave = 0
+            if args.use_checkpoint:
+                saver.save(sess, args.checkpoint_path + "checkpoint", global_step=0)
+            # tf.add_to_collection('vars', reader.batch_size)
+            # print("saved")
+            # exit()
+    
+
+
+
+
     print("DONE")
 
 def get_args():
