@@ -56,7 +56,7 @@ def main():
     args = get_args()
 
     # Set up and run reader
-    reader = Reader(task=args.task, data_dir=args.data_dir)
+    reader = Reader(task=args.task, data_dir=args.data_dir, batch_size=args.batch_size, save_z=args.save_z)
     reader.read_metadata()
     lines, replies = None, None
     if args.task == "twitter":
@@ -68,15 +68,17 @@ def main():
 
     # Set up model
     model = LSTMVAE(lines, \
-                reader.batch_size, args.emb_size, \
+                args.batch_size, args.emb_size, \
                 args.latent_size, reader.vocab_size, reader.max_length, \
                 use_vae=args.use_vae, use_highway=args.use_highway, mutual_lambda=args.mutual_loss_lambda)
     out = model.get_outputs(replies)
 
     loss = model.get_loss(replies, out, use_mutual=args.use_mutual)
     kld = None
+    z = None
     mutual_loss = None
     if args.use_vae:
+        z = model.get_z()
         kld = model.get_kl()
     if args.use_mutual:
         mutual_loss = model.get_mutual_loss()
@@ -105,6 +107,7 @@ def main():
     objective_loss = []
     kl_loss = []
     mutual_losses = []
+    zs = []
     duration = time.time()
 
     output_csv = args.task + "_" + str(args.iterations)
@@ -112,39 +115,66 @@ def main():
         output_csv = output_csv + "_m"
     f = open(args.data_dir+"analytics/" + output_csv + "train.csv", "w", newline='')
     writer = csv.writer(f)
-
+    z_file = None
     if args.use_mutual or args.use_vae:
         cov_file = open(args.data_dir+"analytics/cov.txt", "wb")
+        if args.save_z:
+            z_file = open(args.data_dir+"analytics/z", "wb")
+            ordered_z = []
 
     for step in range(args.iterations):
         obj_l, kl_l, m_l, cov = None, None, None, None
         # Run one iteration for training and save the loss
-        # if args.use_mutual:
-        #     _, obj_l, kl_l, m_l, cov = sess.run([train_op, loss, kld, mutual_loss, model._z_cov], {
-        #         lr: learning_rate
-        #     })
-        #     kl_loss.append(kl_l)
-        #     mutual_losses.append(m_l)
-        # elif args.use_vae:
-        #     _, obj_l, kl_l, cov = sess.run([train_op, loss, kld, model._z_cov], {
-        #         lr: learning_rate
-        #     })
-        #     kl_loss.append(kl_l)
-        # else:
-        _, obj_l = sess.run([train_op, loss], {
-            lr: learning_rate
-        })
-
+        if args.use_mutual:
+            _, obj_l, kl_l, m_l, cov = sess.run([train_op, loss, kld, mutual_loss, model._z_cov], {
+                lr: learning_rate
+            })
+            kl_loss.append(kl_l)
+            mutual_losses.append(m_l)
+        elif args.use_vae:
+            _, obj_l, kl_l, cov = sess.run([train_op, loss, kld, model._z_cov], {
+                lr: learning_rate
+            })
+            kl_loss.append(kl_l)
+        else:
+            _, obj_l = sess.run([train_op, loss], {
+                lr: learning_rate
+            })
         objective_loss.append(obj_l)
+
+        if args.use_mutual or args.use_vae:
+            np.savetxt(cov_file, cov[:5, :5])
+            cov_file.write(str.encode("================================="))
 
         if step % args.update_every == 0:
             print("\nIteration: ", step+1)
             print("Duration: ", time.time()-duration )
             print("Objective loss: %.3f" % obj_l)
-            # if args.use_vae:
-            #     print("KL loss: %.5f\n" % kl_l)
+            if args.use_vae:
+                print("KL loss: %.5f\n" % kl_l)
 
-            c, s, r = sess.run([lines, replies, sample])
+            if args.save_z:
+                c, s, r, za = sess.run([lines, replies, sample, z])
+                # if not len(ordered_z):
+                #     ordered_z = c
+                #     print(len(ordered_z))
+                #     zs.append(za)
+                # else:
+                #     keys = map(lambda k: tuple(k), c)
+                #     zdict = dict(zip(keys, za))
+                #     print(zdict.keys())
+                #     print(len(c))
+                #     print(len(zdict.keys()))
+                #     new_z = []
+                #     for key in ordered_z:
+                #         new_z.append(zdict[tuple(key)])
+                #     zs.append(new_z)
+                #     print(zs)
+                zs.append(za)
+                # print("exit")
+                # exit()
+            else:
+                c, s, r = sess.run([lines, replies, sample])
             for i in range(5):
                 print("====================================================")
                 # Windows: chcp 65001
@@ -154,18 +184,17 @@ def main():
                 # print(c[i])
                 # print(r[:,i])
 
-            # if len(mutual_losses):
-            #     writer.writerow(['Objective loss', 'KLD', 'Mutual loss'])
-            #     writer.writerows(zip(objective_loss, kl_loss, mutual_losses))
-            # if len(kl_loss):
-            #     writer.writerow(['Objective loss', 'KLD'])
-            #     writer.writerows(zip(objective_loss, kl_loss))
-            # else:
-            writer.writerow(['Objective loss'])
-            writer.writerows(zip(objective_loss))
+            if len(mutual_losses):
+                writer.writerow(['Objective loss', 'KLD', 'Mutual loss'])
+                writer.writerows(zip(objective_loss, kl_loss, mutual_losses))
+            if len(kl_loss):
+                writer.writerow(['Objective loss', 'KLD'])
+                writer.writerows(zip(objective_loss, kl_loss))
+            else:
+                writer.writerow(['Objective loss'])
+                writer.writerows(zip(objective_loss))
 
-            # if args.use_mutual or args.use_vae:
-            #     np.savetxt(cov_file, cov[:10])
+
             # c, s, r = sess.run([tf.constant([[3., 3.]]), tf.constant([[3., 3.]]), sample])
             # l_ave = b_ave = d_ave = 0
             if args.use_checkpoint:
@@ -173,10 +202,10 @@ def main():
             # tf.add_to_collection('vars', reader.batch_size)
             # print("saved")
             # exit()
-    
+            
 
-
-
+    if args.save_z:
+        np.savez(z_file, *zs)
 
     print("DONE")
 
@@ -198,6 +227,7 @@ def get_args():
     parser.add_argument('--sample_temp', default=0.7, type=float)
     parser.add_argument('--latent_size', default=128, type=int)
     parser.add_argument('--iterations', default=5000, type=int)
+    parser.add_argument('--batch_size', default=100, type=int)
     parser.add_argument('--data_dir', default='../data/', type=str)
     parser.add_argument('--checkpoint_path', default='../twitter_checkpoint_vae_highway/', type=str)
     parser.add_argument('--use_mutual', default=False, type=str2bool)
@@ -206,6 +236,7 @@ def get_args():
     parser.add_argument('--task', default="twitter", type=str)
     parser.add_argument('--update_every', default=100, type=int)
     parser.add_argument('--use_checkpoint', default=True, type=str2bool)
+    parser.add_argument('--save_z', default=False, type=str2bool)
     args = parser.parse_args()
     return args
 

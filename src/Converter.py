@@ -10,7 +10,7 @@ import numpy as np
 import tensorflow as tf
 
 class Converter(object):
-    def __init__(self, input_filename='', output_filename='', meta_file='', max_length=20, min_length=1, vocab_size=30000, data_type='twitter'):
+    def __init__(self, input_filename='', output_filename='', meta_file='', max_length=20, min_length=1, vocab_size=30000, data_type='twitter', lines=0):
         self.en_whitelist = 'abcdefghijklmnopqrstuvwxyz '
         self.unk_token = 'unk'
         self.input_filename = input_filename
@@ -20,12 +20,14 @@ class Converter(object):
         self.vocab_size = vocab_size
         self.meta_file = meta_file
         self.data_type = data_type
+        self.lines = lines
 
     def process_movies(self):
         print("Begin tokenization")
         translate_table = dict((ord(char), None) for char in string.punctuation)
         with open(self.input_filename, encoding="ISO-8859-1") as f:
             tokenized = []
+            i = 0
             for line in f.readlines():
                 line = line.split(" +++$+++ ")[4]
                 line = line.translate(translate_table)
@@ -33,6 +35,9 @@ class Converter(object):
                 if len(tokens) > self.max_length:
                     continue
                 tokenized.append(tokens)
+                i += 1
+                if self.lines and i == self.lines:
+                    break
             print("Finished tokenization")
             print(tokens[:5])
             print("Indexing")

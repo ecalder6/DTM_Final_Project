@@ -80,6 +80,7 @@ class LSTMVAE(object):
             self._z_mean = z_mean
             self._z_cov = z_log_sigma_sq
 
+            z = None
             ### Highway networks ###
             if use_highway:
                 w1_t = tf.get_variable("w1_transform", shape=[emb_size, latent_size],
@@ -103,11 +104,13 @@ class LSTMVAE(object):
                 z = tf.add(z_mean, tf.multiply(tf.sqrt(tf.exp(z_log_sigma_sq)), eps))
                 reconstruction = tf.add(tf.matmul(z, w2), b2)
                 self._latent_state = LSTMStateTuple(reconstruction, c_state.h)
+            self._z = z
 
         ### Decoder ###
         self.dec_cell = tf.contrib.rnn.OutputProjectionWrapper(self._enc_cell, vocab_size)
 
-
+    def get_z(self):
+        return self._z
 
     def get_outputs(self, y):
         reply_input = tf.concat(  # Add GO token to start
@@ -155,9 +158,9 @@ class LSTMVAE(object):
         return loss
 
     def get_kl(self):
-        latent_loss = -0.5 * tf.reduce_sum(1 + self._z_cov
+        latent_loss = tf.reduce_mean(-0.5 * tf.reduce_sum(1 + self._z_cov
                                             - tf.square(self._z_mean)
-                                            - tf.exp(self._z_cov), 1)
+                                            - tf.exp(self._z_cov), 1))
         return latent_loss
 
     def get_mutual_loss(self):

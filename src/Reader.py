@@ -11,12 +11,13 @@ class Reader(object):
     Reader class
     '''
 
-    def __init__(self, data_dir='', max_length=20, min_length=1, task='twitter', batch_size=100):
+    def __init__(self, data_dir='', max_length=20, min_length=1, task='twitter', batch_size=100, save_z=False):
         self.data_dir = data_dir
         self.max_length = max_length
         self.min_length = min_length
         self._task = task
         self.batch_size = batch_size
+        self.save_z = save_z
 
     def read_records(self, files=None, train=True, min_after_dequeue=10000):
         d = self.data_dir + 'train/' + self._task + '.tfrecords' if train else self.data_dir + 'test/' + self._task + '.tfrecords'
@@ -41,15 +42,26 @@ class Reader(object):
         capacity = min_after_dequeue + 3 * self.batch_size
         
         if self._task == 'twitter':
-            tweets, replies = tf.train.shuffle_batch(
-                [features[k] for k in attributes.keys()],
-                #[features['question'], features['answer']],
-                batch_size=self.batch_size, capacity=capacity, min_after_dequeue=min_after_dequeue)
+            if self.save_z:
+                tweets, replies = tf.train.batch(
+                    [features[k] for k in attributes.keys()],
+                    #[features['question'], features['answer']],
+                    batch_size=self.batch_size)
+            else:
+                tweets, replies = tf.train.shuffle_batch(
+                    [features[k] for k in attributes.keys()],
+                    #[features['question'], features['answer']],
+                    batch_size=self.batch_size, capacity=capacity, min_after_dequeue=min_after_dequeue)
             return tweets, replies
         elif self._task == 'movie':
-            lines = tf.train.shuffle_batch(
-                [features[k] for k in attributes.keys()],
-                batch_size=self.batch_size, capacity=capacity, min_after_dequeue=min_after_dequeue)
+            if self.save_z:
+                lines = tf.train.batch(
+                    [features[k] for k in attributes.keys()],
+                    batch_size=self.batch_size)
+            else:
+                lines = tf.train.shuffle_batch(
+                    [features[k] for k in attributes.keys()],
+                    batch_size=self.batch_size, capacity=capacity, min_after_dequeue=min_after_dequeue)
             return lines
 
     def read_metadata(self, meta_dir='metadata'):
