@@ -83,20 +83,25 @@ class Converter(object):
                 line = line.translate(translate_table)
                 tokens = tknzr.tokenize(line)
                 if len(tokens) > maxq:
-                    skip = True
+                    if not i % 2:
+                        skip = True
+                    else:
+                        qtokenized = qtokenized[:-1]
                     i += 1
                     continue
+                
                 if not i % 2:
                     qtokenized.append(tokens)
                 else:
                     atokenized.append(tokens)
                 i += 1
+                if self.lines and i == self.lines:
+                    break
             print("Finished tokenization")
             print("Indexing")
             idx2w, w2idx, vocab = self.index(qtokenized + atokenized)
             print("Padding")
             idx_q, idx_a = self.zero_pad(qtokenized, w2idx, maxq, atokenized, maxa)
-
             # count of unknowns
 
             unk_count = (idx_q == 1).sum() + (idx_a == 1).sum()
@@ -187,16 +192,12 @@ class Converter(object):
     def int64_feature(self, value):
         return tf.train.Feature(int64_list=tf.train.Int64List(value=value))
 
-    def write_to_tfrecords(self, output_filename, idx_q, idx_a=None):
+    def write_to_tfrecords(self, output_filename, idx_q, idx_a=[]):
         """Converts a dataset to tfrecords."""
         writer = tf.python_io.TFRecordWriter(output_filename)
 
-        if idx_a != None:
+        if len(idx_a):
             for q, a in zip(idx_q, idx_a):
-                if not len(q):
-                    print("NOT LEN Q!")
-                if not len(a):
-                    print("NOT LEN A!")
                 example = tf.train.Example(features=tf.train.Features(feature={
                     'question': self.int64_feature(q),
                     'answer': self.int64_feature(a)}))

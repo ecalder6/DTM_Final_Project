@@ -31,7 +31,7 @@ def main():
         plt.figure(k)
         plt.ylabel('Z value')
         plt.xlabel('Iterations (increment by 10)')
-        plt.title('VAE + Mutual Info sentence auto encoding Z values for ' + str(len(graph_dimensions)) + ' dimensions')
+        plt.title('VAE + Mutual sentence auto encoding Z values for ' + str(len(graph_dimensions)) + ' dimensions')
         for d in graph_vals[k]:
             plt.plot(graph_vals[k][d])
     plt.show()
