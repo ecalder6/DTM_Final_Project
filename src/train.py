@@ -121,9 +121,13 @@ def main():
         if args.save_z:
             z_file = open(args.data_dir+"analytics/z", "wb")
             ordered_z = []
+    anneal = model.get_anneal_assignment(1)
 
     for step in range(args.iterations):
         obj_l, kl_l, m_l, cov = None, None, None, None
+        # Add kl annealing
+        if args.kl_anneal:
+            anneal = model.get_anneal_assignment(1/(1+(1.01)**(-step+999)))
         # Run one iteration for training and save the loss
         if args.use_mutual:
             _, obj_l, kl_l, m_l, cov = sess.run([train_op, loss, kld, mutual_loss, model._z_cov], {
@@ -132,7 +136,7 @@ def main():
             kl_loss.append(kl_l)
             mutual_losses.append(m_l)
         elif args.use_vae:
-            _, obj_l, kl_l, cov = sess.run([train_op, loss, kld, model._z_cov], {
+            _, obj_l, kl_l, cov, kl_anneal = sess.run([train_op, loss, kld, model._z_cov, anneal], {
                 lr: learning_rate
             })
             kl_loss.append(kl_l)
@@ -237,10 +241,12 @@ def get_args():
     parser.add_argument('--update_every', default=100, type=int)
     parser.add_argument('--use_checkpoint', default=True, type=str2bool)
     parser.add_argument('--save_z', default=False, type=str2bool)
+    parser.add_argument('--kl_anneal', default=False, type=str2bool)
     args = parser.parse_args()
     return args
 
 if __name__ == "__main__":
     # Sample command for movie:
     #   python train.py --checkpoint_path=../movie_lstm_checkpoint/ --use_mutual=False --use_vae=False --use_highway=False --task=movie
+    #   python3 train.py --use_checkpoint=False --use_mutual=False --use_vae=False --use_highway=False --task=movie --kl_anneal=True
     main()

@@ -8,7 +8,8 @@ class LSTMVAE(object):
     '''
 
     def __init__(self, x, batch_size, emb_size, \
-        latent_size, vocab_size, seq_max_len, use_vae = True, use_highway = True, mutual_lambda = 0.1):
+        latent_size, vocab_size, seq_max_len, use_vae = True, \
+        use_highway = True, mutual_lambda = 0.1):
         '''
         Initializes a LSTM-VAE by setting up the encoder, VAE, and decoder
 
@@ -28,6 +29,7 @@ class LSTMVAE(object):
         self._max_len = seq_max_len
         self._use_vae = use_vae
         self.mutual_lambda = mutual_lambda
+        self._kl_anneal = tf.Variable(1.0)
 
         ### Encoder ###
         # emb_size is the size of the internal state in each cell.
@@ -123,8 +125,8 @@ class LSTMVAE(object):
                                 swap_memory=True, dtype=tf.float32)
         return dec_out
 
-    # def compute_loss(self, truth, pred):
-
+    def get_anneal_assignment(self, new_val):
+        return self._kl_anneal.assign(new_val)
 
     def get_loss(self, y, output, use_mutual=True):
         ### Cost ###
@@ -132,16 +134,13 @@ class LSTMVAE(object):
         xent = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=output, labels=y)
         dec_loss = tf.reduce_sum(xent, axis=[1])
         loss = None
+        
         # Latent loss
         # latent loss from the other dude's code
         if self._use_vae:
-            latent_loss = -0.5 * tf.reduce_sum(1 + self._z_cov
+            latent_loss = -0.5 * self._kl_anneal * tf.reduce_sum(1 + self._z_cov
                                             - tf.square(self._z_mean)
                                             - tf.exp(self._z_cov), 1)
-            # latent_loss = -0.5 * (tf.reduce_sum(tf.exp(self._z_cov))
-            #                                    + tf.reduce_sum(tf.square(self._z_mean))
-            #                                    - self._emb_size
-            #                                    - tf.log(tf.matrix_determinant(tf.matrix_diag(tf.exp(self._z_cov)))))
             if use_mutual:
                 # Mutual information loss
                 # Entropy of Q. There should be another expectation but we use the stochastic trick to take
@@ -162,6 +161,9 @@ class LSTMVAE(object):
                                             - tf.square(self._z_mean)
                                             - tf.exp(self._z_cov), 1))
         return latent_loss
+
+    def get_kl_anneal(self):
+        return tf.multiply(self._kl_anneal, tf.ones([2,2]))
 
     def get_mutual_loss(self):
         sign = -1
