@@ -126,8 +126,8 @@ def main():
     for step in range(args.iterations):
         obj_l, kl_l, m_l, cov = None, None, None, None
         # Add kl annealing
-        if args.kl_anneal:
-            anneal = model.get_anneal_assignment(1/(1+(1.01)**(-step+999)))
+        if args.kl_anneal and (step % 300 == 0):
+            anneal = model.get_anneal_assignment(1/(1+(1.02)**(-step+200)))
         # Run one iteration for training and save the loss
         if args.use_mutual:
             _, obj_l, kl_l, m_l, cov = sess.run([train_op, loss, kld, mutual_loss, model._z_cov], {
@@ -188,17 +188,6 @@ def main():
                 # print(c[i])
                 # print(r[:,i])
 
-            if len(mutual_losses):
-                writer.writerow(['Objective loss', 'KLD', 'Mutual loss'])
-                writer.writerows(zip(objective_loss, kl_loss, mutual_losses))
-            if len(kl_loss):
-                writer.writerow(['Objective loss', 'KLD'])
-                writer.writerows(zip(objective_loss, kl_loss))
-            else:
-                writer.writerow(['Objective loss'])
-                writer.writerows(zip(objective_loss))
-
-
             # c, s, r = sess.run([tf.constant([[3., 3.]]), tf.constant([[3., 3.]]), sample])
             # l_ave = b_ave = d_ave = 0
             if args.use_checkpoint:
@@ -206,7 +195,16 @@ def main():
             # tf.add_to_collection('vars', reader.batch_size)
             # print("saved")
             # exit()
-            
+    if len(mutual_losses):
+        writer.writerow(['Objective loss', 'KLD', 'Mutual loss'])
+        writer.writerows(zip(objective_loss, kl_loss, mutual_losses))
+    if len(kl_loss):
+        writer.writerow(['Objective loss', 'KLD'])
+        writer.writerows(zip(objective_loss, kl_loss))
+    else:
+        writer.writerow(['Objective loss'])
+        writer.writerows(zip(objective_loss))
+
 
     if args.save_z:
         np.savez(z_file, *zs)
@@ -239,7 +237,7 @@ def get_args():
     parser.add_argument('--use_highway', default=True, type=str2bool)
     parser.add_argument('--task', default="twitter", type=str)
     parser.add_argument('--update_every', default=100, type=int)
-    parser.add_argument('--use_checkpoint', default=True, type=str2bool)
+    parser.add_argument('--use_checkpoint', default=False, type=str2bool)
     parser.add_argument('--save_z', default=False, type=str2bool)
     parser.add_argument('--kl_anneal', default=False, type=str2bool)
     args = parser.parse_args()
@@ -249,4 +247,5 @@ if __name__ == "__main__":
     # Sample command for movie:
     #   python train.py --checkpoint_path=../movie_lstm_checkpoint/ --use_mutual=False --use_vae=False --use_highway=False --task=movie
     #   python3 train.py --use_checkpoint=False --use_mutual=False --use_vae=False --use_highway=False --task=movie --kl_anneal=True
+    # python train.py --checkpoint_path=../movie_lstm_checkpoint/ --use_mutual=False --use_vae=True --use_highway=True --task=movie --use_checkpoint=False --kl_anneal=True --save_z True --update_every=10 --iterations=500 --batch_size=10
     main()

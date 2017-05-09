@@ -241,7 +241,7 @@ class LSTMVAE(object):
 
         optimizer = tf.train.RMSPropOptimizer(lr)
         #optimizer = tf.train.GradientDescentOptimizer(lr)
-        #optimizer = tf.train.AdamOptimizer(lr)
+        # optimizer = tf.train.AdamOptimizer(lr)
         train_op = optimizer.apply_gradients(zip(grads, tvars))
         #train_op = optimizer.minimize(loss)
         return train_op
