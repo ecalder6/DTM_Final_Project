@@ -64,13 +64,14 @@ def main():
     elif args.task == "movie":
         lines = reader.read_records()
         replies = lines
+        # replies = tf.zeros(shape=lines.get_shape(), dtype=tf.int64)
     learning_rate = args.learning_rate
 
     # Set up model
     model = LSTMVAE(lines, \
                 args.batch_size, args.emb_size, \
                 args.latent_size, reader.vocab_size, reader.max_length, \
-                use_vae=args.use_vae, use_highway=args.use_highway, mutual_lambda=args.mutual_loss_lambda)
+                use_vae=args.use_vae, use_highway=args.use_highway, mutual_lambda=args.mutual_loss_lambda, optimizer=args.optimizer)
     out = model.get_outputs(replies)
 
     loss = model.get_loss(replies, out, use_mutual=args.use_mutual)
@@ -115,9 +116,10 @@ def main():
         output_csv = output_csv + "_m"
     f = open(args.data_dir+"analytics/" + output_csv + "train.csv", "w", newline='')
     writer = csv.writer(f)
+    output_writer = open(args.output_file, encoding='utf-8', mode='w')
     z_file = None
     if args.use_mutual or args.use_vae:
-        cov_file = open(args.data_dir+"analytics/cov.txt", "wb")
+        cov_file = open(args.data_dir+args.cov_path, "wb")
         if args.save_z:
             z_file = open(args.data_dir+"analytics/z", "wb")
             ordered_z = []
@@ -151,11 +153,13 @@ def main():
             cov_file.write(str.encode("================================="))
 
         if step % args.update_every == 0:
-            print("\nIteration: ", step+1)
-            print("Duration: ", time.time()-duration )
-            print("Objective loss: %.3f" % obj_l)
+            output_writer.write("\nIteration: " + str(step+1))
+            output_writer.write("\nDuration: " + str(time.time()-duration ))
+            output_writer.write("\nObjective loss: " + str(obj_l))
             if args.use_vae:
-                print("KL loss: %.5f\n" % kl_l)
+                output_writer.write("\nKL loss: " + str(kl_l))
+            if args.use_mutual:
+                output_writer.write("\nMutual loss: " + str(m_l))
 
             if args.save_z:
                 c, s, r, za = sess.run([lines, replies, sample, z])
@@ -180,11 +184,12 @@ def main():
             else:
                 c, s, r = sess.run([lines, replies, sample])
             for i in range(5):
-                print("====================================================")
+                output_writer.write("\n====================================================")
                 # Windows: chcp 65001
-                print(to_eng(c[i], reader.meta['idx2w']), "-->", to_eng(r[:, i], reader.meta['idx2w']))
-                print("True reply: ", to_eng(s[i], reader.meta['idx2w']))
-                print("====================================================")
+                output_writer.write("\n" + to_eng(c[i], reader.meta['idx2w']) + "-->" + to_eng(r[:, i], reader.meta['idx2w']))
+                if args.task == "twitter":
+                    output_writer.write("\nTrue reply: " + to_eng(s[i], reader.meta['idx2w']))
+                output_writer.write("\n====================================================")
                 # print(c[i])
                 # print(r[:,i])
 
@@ -209,7 +214,7 @@ def main():
     if args.save_z:
         np.savez(z_file, *zs)
 
-    print("DONE")
+    output_writer.write("\nDONE")
 
 def get_args():
     def str2bool(v):
@@ -222,7 +227,7 @@ def get_args():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--learning_rate', default=0.01, type=float)
-    parser.add_argument('--mutual_loss_lambda', default=0.1, type=float)
+    parser.add_argument('--mutual_loss_lambda', default=0.01, type=float)
     parser.add_argument('--rnn_hidden_size', default=512, type=int)
     parser.add_argument('--emb_size', default=512, type=int)
     parser.add_argument('--keep_prob', default=0.8, type=float)
@@ -232,6 +237,7 @@ def get_args():
     parser.add_argument('--batch_size', default=100, type=int)
     parser.add_argument('--data_dir', default='../data/', type=str)
     parser.add_argument('--checkpoint_path', default='../twitter_checkpoint_vae_highway/', type=str)
+    parser.add_argument('--cov_path', default='analytics/cov.txt', type=str)
     parser.add_argument('--use_mutual', default=False, type=str2bool)
     parser.add_argument('--use_vae', default=True, type=str2bool)
     parser.add_argument('--use_highway', default=True, type=str2bool)
@@ -240,6 +246,8 @@ def get_args():
     parser.add_argument('--use_checkpoint', default=False, type=str2bool)
     parser.add_argument('--save_z', default=False, type=str2bool)
     parser.add_argument('--kl_anneal', default=False, type=str2bool)
+    parser.add_argument('--output_file', default='../data/outputs/twitter_seq2seq.txt', type=str)
+    parser.add_argument('--optimizer', default='GradientDescent', type=str)
     args = parser.parse_args()
     return args
 

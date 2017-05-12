@@ -1,0 +1,382 @@
+
+Iteration: 1
+Duration: 5.697650909423828
+Objective loss: 96.607
+KL loss: 0.420246
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->without has see like flew my You let How Deep town like had in at capable say and by and 
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->days help done blackmailer Hows out never flew of lay Dont size for Williams Deep Hank Stargher see school Dont 
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->two something alone by dont has a any alone Just lay attack going out we information to by has think 
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->no a So meaning on of something at not Look really him done like driving as he my little use 
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->town thing know wanted to flew let matters You every done thing we Well Hank let then by Williams Dont 
+====================================================
+Iteration: 101
+Duration: 21.58987855911255
+Objective loss: 82.3463
+KL loss: 0.0708595
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->size as And the Hank think Dont and he my we some I without of information Suicides little 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->Look unk attachment those did Yeah it Your out alone he at school size diffuser think intimidate Dont really 
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->those your information every town then school were remorse hard are Well Well any grad capable And matters two 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->Ebers has information attack intimidate Williams Conditioner days It me him and applications size two her 
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->Look see hard had Judge are thats in think attack capable never looking town blowdryer Just grad town thats 
+====================================================
+Iteration: 201
+Duration: 37.5945188999176
+Objective loss: 72.124
+KL loss: 0.0250879
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->about know attachment personal blowdryer really by any 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->about Judge blackmailer her going Stargher for hard grad any those 
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->see It a as my know let Ebers Your 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->on at a and every done 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->Ebers ever you intimidate muscle grad let unk 
+====================================================
+Iteration: 301
+Duration: 53.49915933609009
+Objective loss: 69.7585
+KL loss: 0.0187607
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->know days without Deep Stargher It no me size capable hard How me So 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->wanted without say I attack Conditioner Look my every It alone 
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->unk to Conditioner mother men mother father Ebers two unk by you blackmailer he How 
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->unk for town thats Suicides went Just Size never So no done 
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->went school Im thing human me looking Look 
+====================================================
+Iteration: 401
+Duration: 69.43126821517944
+Objective loss: 67.4881
+KL loss: 0.0218615
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->think crazy to Judge you do it 
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->done done say see went then And up Look 
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->something unk muscle him information by when meaning Size done 
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->were every a Ebers no two me intimidate Just here Look alone on a then blackmailer 
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->Hank capable I intimidate ever lay to to done 
+====================================================
+Iteration: 501
+Duration: 85.367116689682
+Objective loss: 66.5898
+KL loss: 0.0202093
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->men let You Dont without Hows thing Its best he blackmailer Stargher 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->days and school I say blowdryer hard to were Judge Conditioner me best 
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->were father the men capable Deep I men when do crazy here blackmailer 
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->Size blackmailer say best did a me him your think Well 
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->by I personal meaning really done capable matters father I size matters 
+====================================================
+Iteration: 601
+Duration: 101.31386375427246
+Objective loss: 66.1104
+KL loss: 0.0197041
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->father never father little are Its Stargher Size flew really Size no going my 
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->unk for without thats heart when of It by mother let 
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->blackmailer in a matters Ebers something were wanted So something he your a 
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->You help me going as out say town to to ever done 
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->let every done say Yeah you school muscle remorse hard 
+====================================================
+Iteration: 701
+Duration: 117.25556135177612
+Objective loss: 65.7064
+KL loss: 0.0217707
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->all blackmailer wanted Williams went personal to to him days I So personal 
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->ever hard muscle use attachment Its me muscle Williams thats going 
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->him to her Hank going attachment guilt me the matters heart me 
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->Yeah Dont little crazy men to in at to to 
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->meaning your I think went size Look And driving ever a best best looking a 
+====================================================
+Iteration: 801
+Duration: 133.2293643951416
+Objective loss: 64.8125
+KL loss: 0.0198623
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->mother went him And thing Judge meaning blowdryer Its by he me as of do 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->about really blackmailer think a Well out like ever me 
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->it here information your town little I father see Yeah all okay to say do 
+====================================================
+====================================================
+Dont lay any guilt on me Suicides a personal thing best done alone -->And not And Look think did Look attack see the Judge say done 
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->no driving driving wanted up we remorse and were by he 
+====================================================
+Iteration: 901
+Duration: 149.16892266273499
+Objective loss: 62.9114
+KL loss: 0.0202034
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->done muscle It driving this looking when okay blowdryer to a 
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->looking Ebers are Dont we matters Im intimidate diffuser a okay Well then 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->size You Stargher see size a days a we capable Size do something 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->crazy little any best a Hows attachment applications were I me crazy you 
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->Its do no personal as you me say you Williams school information a he 
+====================================================
+Iteration: 1001
+Duration: 165.0799424648285
+Objective loss: 63.4382
+KL loss: 0.0225845
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->It did I meaning went Hank intimidate guilt do has size to had done 
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->blowdryer do mother some thing think a wanted see intimidate me do a 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->And Yeah two never days going mother Dont help it Look 
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->by are best any he You grad attachment me do you 
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->It size grad size her mother remorse you of me did intimidate 
+====================================================
+Iteration: 1101
+Duration: 181.03070998191833
+Objective loss: 63.5669
+KL loss: 0.021966
+====================================================
+Yeah those grad school applications are driving her crazy -->think and let he You thing muscle see days a at he 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->not as best know school on my see me personal something he 
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->diffuser Hows Suicides unk me any Stargher lay and blowdryer remorse Judge 
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->driving days heart lay And something out me done alone help of 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->are Well Your to to blackmailer town I going me human alone 
+====================================================
+Iteration: 1201
+Duration: 196.93710327148438
+Objective loss: 63.1001
+KL loss: 0.0249484
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->let any personal Its Conditioner me thats by best me information remorse do 
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->blackmailer a Just about meaning human a blackmailer me muscle going capable use Hows do 
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->wanted let of thought like attack Well I the about really blackmailer 
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->Look going ever every Im applications see meaning say remorse and attachment remorse 
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->looking Just Suicides he I attachment applications here use men my had a 
+====================================================
+Iteration: 1301
+Duration: 212.86801767349243
+Objective loss: 63.5009
+KL loss: 0.0267705
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->think say matters diffuser of human a information the me has going 
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->looking going Hows use going me at he do him best me men 
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->attack see days Look matters mother had Hows me a Hows do me 
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->those of Stargher heart Hank personal me men this diffuser a attachment 
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->little on to of of going town like thought information a you do 
+====================================================
+Iteration: 1401
+Duration: 228.80539798736572
+Objective loss: 60.86
+KL loss: 0.0245525
+====================================================
+I know Well thats all I really wanted to say So okay then -->Im Its personal capable I he Just And a best to of do 
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->thats say grad when Stargher diffuser something Im her a me me 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->of by personal and information wanted by father dont me me he heart 
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->information of And Your about to you two me Look town do thing 
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->little let it little Hank crazy blowdryer ever went me he Hows driving How So 
+====================================================
+Iteration: 1501
+Duration: 244.75526523590088
+Objective loss: 61.5725
+KL loss: 0.0261085
+====================================================
+I know Well thats all I really wanted to say So okay then -->were guilt when Stargher muscle went never of do I men I 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->You Yeah Stargher to the done by really thing days to me 
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->me as guilt Your Its of we out every let me you do do remorse 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->help you muscle crazy Im applications So me Judge a human my 
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->personal matters this information two guilt muscle I days size me you help men do 
+====================================================
+Iteration: 1601
+Duration: 260.7020843029022
+Objective loss: 61.8117
+KL loss: 0.0247396
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->meaning Ebers your guilt personal two father a a I applications I did personal okay her 
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->as think size to are a a me blackmailer to size personal 
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->hard two I ever okay Just help attachment me did by a intimidate 
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->me wanted I dont it Size use to me a alone days do like 
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->father two days diffuser going Just up were town Judge ever do do do 
+====================================================
+Iteration: 1701
+Duration: 276.62246346473694
+Objective loss: 61.2418
+KL loss: 0.0244703
+====================================================
+I know Well thats all I really wanted to say So okay then -->him personal wanted and him me Deep Williams guilt size of the 
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->you blowdryer done me did use me thought in town me he a attachment 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->Ebers in flew I Williams ever went say not to and a he attachment blackmailer do 
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->say two use really personal my me driving think me he to something he 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->blowdryer know capable to How let hard of you So me okay 
+====================================================
+Iteration: 1801
+Duration: 292.53217339515686
+Objective loss: 62.2867
+KL loss: 0.0284162
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->as town going I to something her okay driving some of attack remorse alone 
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->all two capable to meaning Dont did size me personal use remorse a as 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->human me I Ebers me diffuser without say help some you 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->thats to really thought all It not this ever a he of attack 
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->like all flew like Its do has me to you some I went 
+====================================================
+Iteration: 1901
+Duration: 308.5254006385803
+Objective loss: 60.6414
+KL loss: 0.0319021
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->those know every know Stargher something a do I did Hows 
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->no without And father Hank to Well going my to did diffuser do 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->applications And he here I some all to Hows some him men 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->this let Stargher ever Suicides Suicides And say to information has a So you 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->men two my intimidate out thing okay Williams done her size help 
+====================================================
+DONE

@@ -9,7 +9,7 @@ class LSTMVAE(object):
 
     def __init__(self, x, batch_size, emb_size, \
         latent_size, vocab_size, seq_max_len, use_vae = True, \
-        use_highway = True, mutual_lambda = 0.1):
+        use_highway = True, mutual_lambda = 0.1, optimizer="GradientDescent"):
         '''
         Initializes a LSTM-VAE by setting up the encoder, VAE, and decoder
 
@@ -30,6 +30,7 @@ class LSTMVAE(object):
         self._use_vae = use_vae
         self.mutual_lambda = mutual_lambda
         self._kl_anneal = tf.Variable(1.0)
+        self.optimizer = optimizer
 
         ### Encoder ###
         # emb_size is the size of the internal state in each cell.
@@ -147,7 +148,7 @@ class LSTMVAE(object):
                 # one sample of x (the current x) and use that as an approximation (look at bottom of page 9
                 # in VAE tutorial)
                 sign = -1
-                mutual_loss = sign * self.mutual_lambda * (0.5 * tf.log(tf.matrix_determinant(tf.matrix_diag(tf.exp(self._z_cov)))) + self._emb_size*0.5*(1+tf.log(2*math.pi)))
+                mutual_loss = sign * self.mutual_lambda * (0.5 * tf.log(tf.reduce_prod(tf.exp(self._z_cov)) + self._emb_size*0.5*(1+tf.log(2*math.pi))))
 
             loss = tf.reduce_mean(latent_loss + dec_loss + mutual_loss) if use_mutual else tf.reduce_mean(latent_loss + dec_loss)
             # NOTE: ADDED HYPERPARAMETERS FOR LATENT AND MUTUAL
@@ -167,7 +168,7 @@ class LSTMVAE(object):
 
     def get_mutual_loss(self):
         sign = -1
-        mutual_loss = sign * self.mutual_lambda * (0.5 * tf.log(tf.matrix_determinant(tf.matrix_diag(tf.exp(self._z_cov)))) + self._emb_size*0.5*(1+tf.log(2*math.pi)))
+        mutual_loss = sign * self.mutual_lambda * (0.5 * tf.log(tf.reduce_prod(tf.exp(self._z_cov)) + self._emb_size*0.5*(1+tf.log(2*math.pi))))
         return mutual_loss
 
     def sample(self, sample_temp):
@@ -238,10 +239,13 @@ class LSTMVAE(object):
     def train(self, lr, loss):
         tvars = tf.trainable_variables()
         grads, _ = tf.clip_by_global_norm(tf.gradients(loss, tvars), 1.0)
-
-        optimizer = tf.train.RMSPropOptimizer(lr)
-        #optimizer = tf.train.GradientDescentOptimizer(lr)
-        # optimizer = tf.train.AdamOptimizer(lr)
+        optimizer = None
+        if self.optimizer == "GradientDescent":
+            optimizer = tf.train.GradientDescentOptimizer(lr)
+        elif self.optimizer == "RMSProp":
+            optimizer = tf.train.RMSPropOptimizer(lr)
+        elif self.optimizer == "Adam":
+            optimizer = tf.train.AdamOptimizer(lr)
         train_op = optimizer.apply_gradients(zip(grads, tvars))
         #train_op = optimizer.minimize(loss)
         return train_op
