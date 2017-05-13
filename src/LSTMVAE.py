@@ -4,25 +4,24 @@ from tensorflow.contrib.rnn import LSTMStateTuple
 
 class LSTMVAE(object):
     '''
-    In-house seq2seq with VAE
-    '''
+    Recurrent neural network language model with Variational autoencoder 
+    architecture, based off https://arxiv.org/pdf/1511.06349.pdf .
+    Uses TensorFlow 1.0.
 
+    Args:
+        x (tensor):         A tensor holding the input to our network.
+        layers (int):       The number of layers we use in the encoder
+        batch_size (int):   The size of our batches
+        emb_size (int):     word embedding dimension also the length of the
+                            state being passed around inside a LSTM cell
+        latent_size (int):  The number of latent variables in our VAE
+        vocab_size (int):   length of vocabulary
+        seq_max_len (int):  limit on length of input and output
+
+    '''
     def __init__(self, x, batch_size, emb_size, \
         latent_size, vocab_size, seq_max_len, use_vae = True, \
         use_highway = True, mutual_lambda = 0.1):
-        '''
-        Initializes a LSTM-VAE by setting up the encoder, VAE, and decoder
-
-        Arguments:
-            x (tensor): A tensor holding the input to our network.
-            layers (int):   The number of layers we use in the encoder
-            batch_size (int):   The size of our batches
-            emb_size (int): word embedding dimension also the length of the
-                            state being passed around inside a LSTM cell
-            latent_size (int):  The number of latent variables in our VAE
-            vocab_size (int): length of vocabulary
-            seq_max_len (int):  limit on length of input and output
-        '''
 
         self._batch_size = batch_size
         self._emb_size = emb_size

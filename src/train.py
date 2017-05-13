@@ -22,36 +22,6 @@ def to_eng(ids, ix_to_word):
             output += ix_to_word[id] + " "
     return output
 
-
-# def print_shapes():
-#     train_vars = tf.trainable_variables()
-
-#     lines = ['']
-#     lines.append('Trainable Variables:')
-#     lines.append('====================')
-#     total_params = 0
-#     for var in train_vars:
-#         n_param = reduce(operator.mul, var.get_shape().as_list(), 1)
-#         total_params += n_param
-#         lines.append('%20s %8d %s' % (var.get_shape().as_list(), n_param, var.name))
-#     lines.append('Total trainable parameters: %d' % total_params)
-    
-#     lines.append('')
-#     lines.append('Other Varaibles:')
-#     lines.append('================')
-#     total_params = 0
-#     for var in tf.global_variables():
-#         if var in train_vars: continue
-#         n_param = reduce(operator.mul, var.get_shape().as_list(), 1)
-#         total_params += n_param
-#         lines.append('%20s %8d %s' % (var.get_shape().as_list(), n_param, var.name))
-#     lines.append('Total non-trainable parameters: %d' % total_params)
-    
-#     return '\n'.join(lines)
-
-
-
-
 def main():
     args = get_args()
 
