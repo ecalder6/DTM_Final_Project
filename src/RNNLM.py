@@ -26,7 +26,6 @@ class RNNLMVAE(object):
         latent_size (int):  The number of latent variables in our VAE
         vocab_size (int):   length of vocabulary
         seq_max_len (int):  limit on length of input and output
-
     '''
     def __init__(   self, 
                     batch_size, 
@@ -71,12 +70,14 @@ class RNNLMVAE(object):
 
         updates = self.get_updates(self.dec_out, y, optimizer, learning_rate)
         train_start_time = time.time()
+        losses = [[] for _ in updates]
+        sample_outputs = [[[] for _ in range(3)] for _ in range(5)]
+        all_z = [[[] for _ in range(5)] for _ in range(5)]
+
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
             coord = tf.train.Coordinator()
             threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-            losses = [[] for _ in updates]
-            sample_outputs = []
             
             for step in range(iterations):
                 iteration_start_time = time.time()
@@ -89,9 +90,8 @@ class RNNLMVAE(object):
                     _, l = sess.run([up,loss])
                     losses[i].append(l)
                     i += 1
-                if step % 100 == 0 or True:
+                if step % 100 == 0:
                     actual_x, actual_y, sampled_y, z = sess.run([x, y, self.sample(), self.z])
-                    sample_outputs.append((actual_x, actual_y, sampled_y))
 
                     print("\nIteration: ", step+1)
                     print("Duration for this epoch: ", time.time()-iteration_start_time )
@@ -107,9 +107,13 @@ class RNNLMVAE(object):
                         print("True reply: ", to_eng(actual_y[i], reader_meta['idx2w']))
                         print("First 5 z values: ", z[i][:5])
                         print("====================================================\n\n")
-                        # print(c[i])
-                        # print(r[:,i])
+                        sample_outputs[i][0].append(to_eng(actual_x[i], reader_meta['idx2w']))
+                        sample_outputs[i][1].append(to_eng(actual_y[i], reader_meta['idx2w']))
+                        sample_outputs[i][2].append(to_eng(sampled_y[:, i], reader_meta['idx2w']))
+                        for j in range(5):
+                            all_z[i][j].append(z[i][j])
             print("Total training time: ", time.time() - train_start_time)
+            return losses, sample_outputs, all_z
 
     def get_updates(self, dec_out, y, optimizer, learning_rate, use_mutual=True):
         # Get the normal model's losses
@@ -164,7 +168,10 @@ class RNNLMVAE(object):
         Encoder and decoder are basic Seq2Seq models. The decoder is fully
         made in train.
 
-        TODO: It would be great to separate the construction of the graph from 
+        Args:
+            x: input data
+
+        TODO: It would be great to separate the construction of the graph from
         seeing x but we use tf.records and queue runners and we don't know how to
         use placeholders with the queue runners. We would have to switch to feed
         dictionaries to release the dependency on x here.
@@ -181,6 +188,7 @@ class RNNLMVAE(object):
         # I REALLY WANT TO GET RID OF THIS X.
         # TENSORFLOW STUPID DESIGN CHOICES.
         # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        #x = tf.placeholder(tf.float32, [None, self.max_len])
         emb_input = tf.nn.embedding_lookup(self.word_embeddings, x)
 
         emb_size = self.emb_size

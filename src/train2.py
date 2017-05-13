@@ -9,7 +9,6 @@ import os, random, time, glob, pickle
 
 import tensorflow as tf
 
-from functools import reduce
 import operator
 import argparse
 import csv
@@ -39,7 +38,19 @@ def main():
     # Set up model
     model = RNNLMVAE(args.batch_size, args.emb_size, args.latent_size, reader.vocab_size, reader.max_length)
     model.construct_graph(lines)
-    model.train(lines,replies, args.iterations, reader.meta)
+    losses, sample_outputs, sample_z_values = model.train(lines,replies, args.iterations, reader.meta)
+    with open("losses.csv", "w", newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['Decoder loss', 'KLD', 'Mutual loss'])
+        writer.writerows(zip(losses[0], losses[1], losses[2]))
+    for i in range(5):
+        with open("z_values"+str(i+1)+".csv", "w", newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(zip(sample_z_values[i][0], sample_z_values[i][1], sample_z_values[i][2]))
+        with open("sample_outputs"+str(i+1)+".csv", "w", newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['Tweet', 'Real reply', 'Predicted reply'])
+            writer.writerows(zip(sample_outputs[i][0], sample_outputs[i][1], sample_outputs[i][2]))
 
     print("DONE")
 
@@ -66,11 +77,11 @@ def get_args():
     parser.add_argument('--checkpoint_path', default='../twitter_checkpoint_vae_highway/', type=str)
     parser.add_argument('--use_mutual', default=False, type=str2bool)
     parser.add_argument('--use_vae', default=True, type=str2bool)
-    parser.add_argument('--use_highway', default=True, type=str2bool)
+    parser.add_argument('--use_highway', default= True, type=str2bool)
     parser.add_argument('--task', default="twitter", type=str)
     parser.add_argument('--update_every', default=100, type=int)
     parser.add_argument('--use_checkpoint', default=True, type=str2bool)
-    parser.add_argument('--save_z', default=False, type=str2bool)
+    parser.add_argument('--save_z', default=True, type=str2bool)
     parser.add_argument('--kl_anneal', default=False, type=str2bool)
     args = parser.parse_args()
     return args
