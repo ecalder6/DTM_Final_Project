@@ -1,6 +1,10 @@
 from Converter import Converter
 import argparse
 
+'''
+Driver program for tokenizing input and convert to tfrecords.
+'''
+
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', default='../data/', type=str)

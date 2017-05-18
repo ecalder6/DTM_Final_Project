@@ -1,5 +1,11 @@
 # python3 data.py data/twitter.txt twitter.tfrecords
 
+'''
+DEPRECATED: see data.py instead.
+Changes input tweets into vector of indexes for characters.
+Not used as character tokenization give poor results.
+'''
+
 vocab = "| abcdefghijklmnopqrstuvwxyz"+\
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"+\
         "1234567890"+\

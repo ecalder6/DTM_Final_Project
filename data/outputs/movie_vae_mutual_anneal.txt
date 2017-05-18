@@ -1,0 +1,402 @@
+
+Iteration: 1
+Duration: 5.6765899658203125
+Objective loss: 96.5015
+KL loss: 0.397755
+Mutual loss: -0.0329412
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->crazy do has father blackmailer Ebers hard applications any meaning going and you best me some by like know 
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->to Yeah Suicides went human are every mother this on this are flew ever Just without and something he your 
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->muscle then dont little And remorse crazy Look all see when attachment really let we your were father those blackmailer 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->use heart dont help remorse out out him in see Dont And little on done went crazy you do Judge 
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->personal know ever school alone applications then not blackmailer attack any crazy You looking the for intimidate little Im You 
+====================================================
+Iteration: 101
+Duration: 23.360429763793945
+Objective loss: 80.2976
+KL loss: 0.0771326
+Mutual loss: -0.0329412
+====================================================
+Yeah those grad school applications are driving her crazy -->of do Just let Ebers meaning Yeah father muscle were little Well How blowdryer Williams size me looking 
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->as lay know father and little never were looking think your Just So remorse attachment 
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->not How size do Dont every lay How heart all know know dont town Deep diffuser when never 
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->out then about without going lay Stargher muscle heart had attack information do thing like I unk Your 
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->some Hows father Hows days diffuser of to at Deep Hank of Deep attack went crazy my 
+====================================================
+Iteration: 201
+Duration: 41.01929569244385
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->
+====================================================
+Iteration: 301
+Duration: 58.72305417060852
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->
+====================================================
+Iteration: 401
+Duration: 76.37089943885803
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+I know Well thats all I really wanted to say So okay then -->
+====================================================
+====================================================
+Dont lay any guilt on me Suicides a personal thing best done alone -->
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->
+====================================================
+Iteration: 501
+Duration: 94.04005193710327
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->
+====================================================
+Iteration: 601
+Duration: 111.77372241020203
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->
+====================================================
+Iteration: 701
+Duration: 129.41618824005127
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->
+====================================================
+Iteration: 801
+Duration: 147.0384075641632
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Yeah those grad school applications are driving her crazy -->
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->
+====================================================
+Iteration: 901
+Duration: 164.72889852523804
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->
+====================================================
+Iteration: 1001
+Duration: 182.41375994682312
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->
+====================================================
+Iteration: 1101
+Duration: 200.0437455177307
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Yeah those grad school applications are driving her crazy -->
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->
+====================================================
+====================================================
+Dont lay any guilt on me Suicides a personal thing best done alone -->
+====================================================
+====================================================
+I know Well thats all I really wanted to say So okay then -->
+====================================================
+====================================================
+Dont lay any guilt on me Suicides a personal thing best done alone -->
+====================================================
+Iteration: 1201
+Duration: 217.7887749671936
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+====================================================
+Dont lay any guilt on me Suicides a personal thing best done alone -->
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+Iteration: 1301
+Duration: 235.40703415870667
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->
+====================================================
+====================================================
+Dont lay any guilt on me Suicides a personal thing best done alone -->
+====================================================
+Iteration: 1401
+Duration: 253.06768703460693
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->
+====================================================
+====================================================
+Just a little when we were looking up information about Williams father How did he help -->
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->
+====================================================
+Iteration: 1501
+Duration: 270.7688157558441
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Dont lay any guilt on me Suicides a personal thing best done alone -->
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->
+====================================================
+Iteration: 1601
+Duration: 288.40212774276733
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Yeah those grad school applications are driving her crazy -->
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->
+====================================================
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->
+====================================================
+Iteration: 1701
+Duration: 306.03823947906494
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Size has no meaning It matters not Look at me Judge me by my size do you -->
+====================================================
+====================================================
+Dont lay any guilt on me Suicides a personal thing best done alone -->
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->
+====================================================
+====================================================
+Ebers Deep Conditioner every two days And I never ever use a blowdryer without the diffuser attachment -->
+====================================================
+Iteration: 1801
+Duration: 323.7464904785156
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->
+====================================================
+====================================================
+Its your father Hank Your mother went to see him and he had a heart attack -->
+====================================================
+====================================================
+Dont lay any guilt on me Suicides a personal thing best done alone -->
+====================================================
+====================================================
+And here I thought you flew in some out of town muscle Hows it going men -->
+====================================================
+Iteration: 1901
+Duration: 341.3907482624054
+Objective loss: nan
+KL loss: nan
+Mutual loss: nan
+====================================================
+Yeah those grad school applications are driving her crazy -->
+====================================================
+====================================================
+Dont lay any guilt on me Suicides a personal thing best done alone -->
+====================================================
+====================================================
+Yeah those grad school applications are driving her crazy -->
+====================================================
+====================================================
+Its hard for me to see Stargher as human capable of something like remorse -->
+====================================================
+====================================================
+You dont think Im going to let this blackmailer intimidate me do you -->
+====================================================
+DONE

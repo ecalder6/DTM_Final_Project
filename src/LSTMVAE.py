@@ -21,7 +21,20 @@ class LSTMVAE(object):
     '''
     def __init__(self, x, batch_size, emb_size, \
         latent_size, vocab_size, seq_max_len, use_vae = True, \
-        use_highway = True, mutual_lambda = 0.1):
+        use_highway = True, mutual_lambda = 0.1, optimizer="GradientDescent"):
+        '''
+        Initializes a LSTM-VAE by setting up the encoder, VAE, and decoder
+
+        Arguments:
+            x (tensor): A tensor holding the input to our network.
+            layers (int):   The number of layers we use in the encoder
+            batch_size (int):   The size of our batches
+            emb_size (int): word embedding dimension also the length of the
+                            state being passed around inside a LSTM cell
+            latent_size (int):  The number of latent variables in our VAE
+            vocab_size (int): length of vocabulary
+            seq_max_len (int):  limit on length of input and output
+        '''
 
         self._batch_size = batch_size
         self._emb_size = emb_size
@@ -29,6 +42,7 @@ class LSTMVAE(object):
         self._use_vae = use_vae
         self.mutual_lambda = mutual_lambda
         self._kl_anneal = tf.Variable(1.0)
+        self.optimizer = optimizer
 
         ### Encoder ###
         # emb_size is the size of the internal state in each cell.
@@ -53,13 +67,13 @@ class LSTMVAE(object):
         # At run time this gets filled as the batch size
         _, c_state = tf.nn.dynamic_rnn( \
                     self._enc_cell, emb_input, swap_memory=True, dtype=tf.float32)
+        self._c = c_state
         if not use_vae:
             self._latent_state = c_state
 
 
         ### VAE ###
         # Set up the audoencoder weights and layers
-        # Why get_variable vs. variable here?
         if use_vae:
             w1 = tf.get_variable("w1", shape=[emb_size, latent_size],
                 initializer=tf.contrib.layers.xavier_initializer())
@@ -69,9 +83,6 @@ class LSTMVAE(object):
             log_sigma_b1 = tf.Variable(tf.zeros([latent_size], dtype=tf.float32))
             w2 = tf.Variable(tf.zeros([latent_size, emb_size], dtype=tf.float32))
             b2 = tf.Variable(tf.zeros([emb_size], dtype=tf.float32))
-
-
-
 
             # Here we get the parameters of the latent posterior
             z_mean = tf.add(tf.matmul(c_state.c, w1), b1)
@@ -114,7 +125,10 @@ class LSTMVAE(object):
         return self._z
 
     def get_outputs(self, y):
-        reply_input = tf.concat(  # Add GO token to start
+        '''
+        Get the output of the decoder.
+        '''
+        reply_input = tf.concat(
             [tf.zeros(shape=(self._batch_size, 1), dtype=tf.int64), y[:, :self._max_len-1]], axis=1)
         emb_reply_input = tf.nn.embedding_lookup(self._word_embeddings, reply_input)
         with tf.variable_scope("decoder"):
@@ -128,6 +142,9 @@ class LSTMVAE(object):
         return self._kl_anneal.assign(new_val)
 
     def get_loss(self, y, output, use_mutual=True):
+        '''
+        Get the objective loss, which could factor in VAE and mutual information.
+        '''
         ### Cost ###
         # Regular LSTM loss
         xent = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=output, labels=y)
@@ -135,7 +152,6 @@ class LSTMVAE(object):
         loss = None
         
         # Latent loss
-        # latent loss from the other dude's code
         if self._use_vae:
             latent_loss = -0.5 * self._kl_anneal * tf.reduce_sum(1 + self._z_cov
                                             - tf.square(self._z_mean)
@@ -145,12 +161,9 @@ class LSTMVAE(object):
                 # Entropy of Q. There should be another expectation but we use the stochastic trick to take
                 # one sample of x (the current x) and use that as an approximation (look at bottom of page 9
                 # in VAE tutorial)
-                sign = -1
-                mutual_loss = sign * self.mutual_lambda * (0.5 * tf.log(tf.matrix_determinant(tf.matrix_diag(tf.exp(self._z_cov)))) + self._emb_size*0.5*(1+tf.log(2*math.pi)))
+                mutual_loss = tf.reduce_mean(0.5 * tf.square( self._z - self._c ))
 
             loss = tf.reduce_mean(latent_loss + dec_loss + mutual_loss) if use_mutual else tf.reduce_mean(latent_loss + dec_loss)
-            # NOTE: ADDED HYPERPARAMETERS FOR LATENT AND MUTUAL
-            # loss = tf.reduce_mean(dec_loss + 0.01*(latent_loss + mutual_loss)) if use_mutual else tf.reduce_mean(0.01*latent_loss + dec_loss)
         else:
             loss = tf.reduce_mean(dec_loss)
         return loss
@@ -165,9 +178,7 @@ class LSTMVAE(object):
         return tf.multiply(self._kl_anneal, tf.ones([2,2]))
 
     def get_mutual_loss(self):
-        sign = -1
-        mutual_loss = sign * self.mutual_lambda * (0.5 * tf.log(tf.matrix_determinant(tf.matrix_diag(tf.exp(self._z_cov)))) + self._emb_size*0.5*(1+tf.log(2*math.pi)))
-        return mutual_loss
+        return tf.reduce_mean(0.5 * tf.square( self._z - self._c ))
 
     def sample(self, sample_temp):
         '''
@@ -178,7 +189,7 @@ class LSTMVAE(object):
         def loop_fn(time, cell_output, cell_state, loop_state):
             if cell_output is None:  # time == 0
                 next_cell_state = self._latent_state  # state from the encoder
-                next_input = tf.zeros([self._batch_size], dtype=tf.int64)  # GO symbol
+                next_input = tf.zeros([self._batch_size], dtype=tf.int64)
                 next_input = tf.nn.embedding_lookup(self._word_embeddings, next_input)
                 emit_output = tf.zeros([], dtype=tf.int64)
             else:
@@ -207,11 +218,12 @@ class LSTMVAE(object):
         Returns a sample from the decoder. loop_fn is what's ran
         at each cell from the start of the decoder to the end.
         outputs_ta is the output of the final cell.
+        Code templated from tensorflow documentation.
         '''
         def loop_fn(time, cell_output, cell_state, loop_state):
             if cell_output is None:  # time == 0
                 next_cell_state = self._latent_state  # state from the encoder
-                next_input = tf.zeros([self._batch_size, self._max_len, ], dtype=tf.int64)  # GO symbol
+                next_input = tf.zeros([self._batch_size, self._max_len, ], dtype=tf.int64)
                 next_input = tf.nn.embedding_lookup(self._word_embeddings, next_input)
                 emit_output = tf.zeros([], dtype=tf.int64)
             else:
@@ -235,12 +247,17 @@ class LSTMVAE(object):
         return sample
 
     def train(self, lr, loss):
+        '''
+        Computes the gradients and optimize it using either gradient descent, RMSprop, or Adam.
+        '''
         tvars = tf.trainable_variables()
         grads, _ = tf.clip_by_global_norm(tf.gradients(loss, tvars), 1.0)
-
-        optimizer = tf.train.RMSPropOptimizer(lr)
-        #optimizer = tf.train.GradientDescentOptimizer(lr)
-        #optimizer = tf.train.AdamOptimizer(lr)
+        optimizer = None
+        if self.optimizer == "GradientDescent":
+            optimizer = tf.train.GradientDescentOptimizer(lr)
+        elif self.optimizer == "RMSProp":
+            optimizer = tf.train.RMSPropOptimizer(lr)
+        elif self.optimizer == "Adam":
+            optimizer = tf.train.AdamOptimizer(lr)
         train_op = optimizer.apply_gradients(zip(grads, tvars))
-        #train_op = optimizer.minimize(loss)
         return train_op

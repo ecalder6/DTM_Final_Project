@@ -1,6 +1,6 @@
 '''
 Reader for our final project.
-Deals with handling all the data reading
+Deals with handling all the data reading from tfrecords.
 '''
 
 import glob, pickle
@@ -20,6 +20,9 @@ class Reader(object):
         self.save_z = save_z
 
     def read_records(self, files=None, train=True, min_after_dequeue=10000):
+        '''
+        Read tfrecords into memory.
+        '''
         d = self.data_dir + 'train/' + self._task + '.tfrecords' if train else self.data_dir + 'test/' + self._task + '.tfrecords'
         proto_files = glob.glob(d)
         # Construct a queue of records to read
@@ -45,12 +48,10 @@ class Reader(object):
             if self.save_z:
                 tweets, replies = tf.train.batch(
                     [features[k] for k in attributes.keys()],
-                    #[features['question'], features['answer']],
                     batch_size=self.batch_size)
             else:
                 tweets, replies = tf.train.shuffle_batch(
                     [features[k] for k in attributes.keys()],
-                    #[features['question'], features['answer']],
                     batch_size=self.batch_size, capacity=capacity, min_after_dequeue=min_after_dequeue)
             return tweets, replies
         elif self._task == 'movie':
@@ -65,5 +66,8 @@ class Reader(object):
             return lines
 
     def read_metadata(self, meta_dir='metadata'):
+        '''
+        Read in the metadata, which includes vocabulary, index to tokens, and tokens to index.
+        '''
         self.meta = pickle.load( open( self.data_dir + "metadata/" + self._task + "_" +  meta_dir, "rb" ) )
         self.vocab_size = len(self.meta['vocab'])
