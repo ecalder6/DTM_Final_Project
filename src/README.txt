@@ -27,3 +27,7 @@ How to run the code:
     2. in ~/src/, run python data.py --input_filename=raw/movie.txt --output_filename=train/movie.tfrecords --meta_file=metadata/movie_metadata --data_type=movie
         2.1. for twitter, replace movie with twitter in command.
     3. Train the model using run.cmd (either running it or running one of the command in it)
+
+Where to get the data:
+    Twitter: https://drive.google.com/file/d/0B5kI8Ac4XQFyOGVFRXBSWm5MM0U/view?usp=sharing
+    Movie: https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html
