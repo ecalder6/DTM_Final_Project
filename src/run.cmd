@@ -3,13 +3,13 @@ ECHO "twitter_seq2seq"
 python train.py --cov_path=analytics/twitter_seq2seq --use_mutual=False --use_vae=False --use_highway=False --kl_anneal=False --use_checkpoint=False --task=twitter --iterations=2000 --output_file=../data/outputs/twitter_seq2seq.txt
 
 ECHO "twitter_vae"
-python train.py --cov_path=analytics/twitter_vae --use_mutual=False --use_vae=True --use_highway=False --kl_anneal=False --use_checkpoint=True --task=twitter --iterations=2000 --output_file=../data/outputs/twitter_vae.txt
+python train.py --cov_path=analytics/twitter_vae --use_mutual=False --use_vae=True --use_highway=False --kl_anneal=False --use_checkpoint=False --task=twitter --iterations=2000 --output_file=../data/outputs/twitter_vae.txt
 
 ECHO "twitter_vae_anneal"
 python train.py --cov_path=analytics/twitter_vae_anneal --use_mutual=False --use_vae=True --use_highway=False --kl_anneal=True --use_checkpoint=False --task=twitter --iterations=2000 --output_file=../data/outputs/twitter_vae.txt
 
 ECHO "twitter_vae_highway"
-python train.py --cov_path=analytics/twitter_vae_highway --use_mutual=False --use_vae=True --use_highway=True --kl_anneal=False --use_checkpoint=True --task=twitter --iterations=5000 --output_file=../data/outputs/twitter_vae_highway.txt
+python train.py --cov_path=analytics/twitter_vae_highway --use_mutual=False --use_vae=True --use_highway=True --kl_anneal=False --use_checkpoint=False --task=twitter --iterations=5000 --output_file=../data/outputs/twitter_vae_highway.txt
 
 ECHO "twitter_vae_highway_anneal"
 python train.py --cov_path=analytics/twitter_vae_highway_annealz --use_mutual=False --use_vae=True --use_highway=True --kl_anneal=True --use_checkpoint=False --task=twitter --iterations=500 --update_every=10 --save_z=True --output_file=../data/outputs/twitter_vae_highway_annealz.txt
