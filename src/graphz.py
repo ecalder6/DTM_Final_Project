@@ -2,6 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 
+'''
+Script for creating the Z graphs shown in the slides and writeup.
+'''
+
 def main():
     args = get_args()
     f = open(args.file_name, "rb")
@@ -31,7 +35,7 @@ def main():
         plt.figure(k)
         plt.ylabel('Z value')
         plt.xlabel('Iterations (increment by 10)')
-        plt.title('Movie: VAE + Highway sentence auto encoding Z values for ' + str(len(graph_dimensions)) + ' dimensions')
+        plt.title('Twitter: VAE+Mutual+Highway+Anneal sentence auto encoding Z values for ' + str(len(graph_dimensions)) + ' dimensions')
         for d in graph_vals[k]:
             plt.plot(graph_vals[k][d])
     plt.show()

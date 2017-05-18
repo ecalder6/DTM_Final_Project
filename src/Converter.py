@@ -3,6 +3,8 @@ Convert raw data to tfrecords
 Currently only supports twitter data with format:
     Tweet
     Reply
+
+See data.py for driver code.
 '''
 
 import nltk, pickle, itertools, string
@@ -23,6 +25,9 @@ class Converter(object):
         self.lines = lines
 
     def process_movies(self):
+        '''
+        Tokenize movie lines and write to TF recrods.
+        '''
         print("Begin tokenization")
         translate_table = dict((ord(char), None) for char in string.punctuation)
         with open(self.input_filename, encoding="ISO-8859-1") as f:
@@ -63,6 +68,9 @@ class Converter(object):
             return w2idx, idx2w, vocab
     
     def process_tweets(self):
+        '''
+        Tokenize tweets and write to TF recrods. Note that odd lines are tweets and even lines are replies.
+        '''
         maxq = maxa = self.max_length
         minq = mina = self.min_length
         tknzr = nltk.tokenize.TweetTokenizer(strip_handles=True, reduce_len=True)
@@ -127,14 +135,14 @@ class Converter(object):
         elif self.data_type == "movie":
             w2idx, idx2w, vocab = self.process_movies()
 
-        # let us now save the necessary dictionaries
+        # Save the metadata, which includes the vocabulary, the token to index dictionary, and the index to token dictionary.
         metadata = {
                 'w2idx' : w2idx,
                 'idx2w' : idx2w,
                 'vocab' : vocab,
                     }
 
-        # write to disk : data control dictionaries
+        # write metadata to disk
         with open(self.meta_file, 'wb') as f:
             pickle.dump(metadata, f)
 
@@ -180,8 +188,6 @@ class Converter(object):
             if atokenized and maxa:
                 a_indices = self.pad_seq(atokenized[i], w2idx, maxa)
 
-            #print(len(idx_q[i]), len(q_indices))
-            #print(len(idx_a[i]), len(a_indices))
             idx_q[i] = np.array(q_indices)
             if atokenized and maxa:
                 idx_a[i] = np.array(a_indices)
