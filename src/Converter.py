@@ -4,7 +4,7 @@ Currently only supports twitter data with format:
     Tweet
     Reply
 
-See data.py for driver code.
+See data.py for driver code and input/output.
 '''
 
 import nltk, pickle, itertools, string

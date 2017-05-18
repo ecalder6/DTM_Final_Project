@@ -4,6 +4,9 @@ import argparse
 
 '''
 Script for creating the Z graphs shown in the slides and writeup.
+
+Input: raw z values and size of z.
+Output: plot of z values
 '''
 
 def main():

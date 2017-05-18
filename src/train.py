@@ -15,6 +15,13 @@ import argparse
 import csv
 import numpy as np
 
+'''
+The driver program for our LSTMVAE. Trains our model and record errors and sample generated outputs.
+
+Input: Hyperparameters for our model, parameters for training, and checkpoint and outputfile locations
+Output: Output files that contain errors and sample generated outputs from our model.
+'''
+
 def to_eng(ids, ix_to_word):
     '''
     Convert indexes to tokens.

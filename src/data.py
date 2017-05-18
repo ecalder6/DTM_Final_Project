@@ -3,6 +3,9 @@ import argparse
 
 '''
 Driver program for tokenizing input and convert to tfrecords.
+
+Input: raw data file
+Output: tfrecord file and metafile
 '''
 
 def get_args():

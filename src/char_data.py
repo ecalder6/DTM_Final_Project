@@ -4,6 +4,9 @@
 DEPRECATED: see data.py instead.
 Changes input tweets into vector of indexes for characters.
 Not used as character tokenization give poor results.
+
+Input: raw data file
+Output: tfrecord file
 '''
 
 vocab = "| abcdefghijklmnopqrstuvwxyz"+\

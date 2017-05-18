@@ -1,6 +1,9 @@
 '''
 Reader for our final project.
 Deals with handling all the data reading from tfrecords.
+
+Input: tfrecord file and metafile
+Output: the input read into memeory
 '''
 
 import glob, pickle
